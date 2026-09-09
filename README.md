@@ -13,6 +13,7 @@
 | `docs/LEADER.md` | Leaderの責務と手順 |
 | `docs/WORKER.md` | Workerの責務と制約 |
 | `docs/GATE.md` | 品質ゲートの定義 |
+| `docs/STACK.md` | 技術構成の決定と未確定事項 |
 | `docs/TASK_TEMPLATE.md` | LeaderがWorkerへTaskを渡す形式 |
 
 ## Gate
@@ -26,16 +27,21 @@ Gateはpush・PRごとに GitHub Actions（`.github/workflows/gate.yml`）でも
 
 検証コマンドは `gate.conf` で宣言する。Gateスクリプトは技術構成を推測しない。
 
+レイヤ境界（`src/README.md`）は `scripts/check-architecture.sh` が検証する。
+
 ## 技術構成
 
-未確定。
+React Native + Expo (TypeScript) / Supabase。
 
-アプリケーションコードはまだ存在しない。技術構成が決まるまで `gate.conf` の
-構成依存チェック（typecheck / lint / test / build / migration / dependency /
-architecture）はすべて未設定であり、GateはSKIPとして報告する。
+詳細と未確定事項は `docs/STACK.md` を参照。
 
-技術構成の決定はLeaderがユーザーへ確認してから行う。AIが単独で決めない
-（CLAUDE.md 第9章・第16章）。
+```sh
+npm install
+npm start           # Expo 開発サーバー
+npm run typecheck
+npm run lint
+npm run test
+```
 
 ## Branch
 
