@@ -38,3 +38,22 @@ migrationは、先頭に理由と既存データへの影響を書く。
 PostgreSQLクラスタを起動する。
 
 Gateの `migration` 項目としても実行される。
+
+## 採番はLeaderが行う
+
+複数Workerが並行してmigrationを作ると、timestampが近接して適用順が意図とずれる。
+
+Leaderがtimestampを含むファイル名をTask発行時に指定する。Workerは自分で採番しない。
+
+原則として 1 Task = 最大 1 migration とする。
+
+重複はGateが検出するが、事故を検出する仕組みであって採番方法ではない。
+
+## RLS
+
+すべてのテーブルで row level security を有効にし、ポリシーをmigrationに書く。
+
+認可判定はRLSがSingle Source of Truth。クライアント側に置かない。
+理由と方針は docs/DOMAIN.md 第5章を参照。
+
+ポリシーを持たないテーブルを公開しない。
