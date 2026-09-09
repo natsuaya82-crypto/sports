@@ -34,4 +34,17 @@ Pods/
 *.xcuserstate
 xcuserdata/
 
-# ここから下は、技術構成が確定した時点でLeaderが追記する。
+# Expo / React Native
+.expo/
+.expo-export/
+dist/
+web-build/
+expo-env.d.ts
+.metro-health-check*
+*.orig.*
+*.p8
+*.tsbuildinfo
+
+# 生成されるnativeディレクトリ（prebuild成果物）
+/ios
+/android
