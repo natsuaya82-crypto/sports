@@ -48,12 +48,17 @@ skip() {
   SKIP_COUNT=$((SKIP_COUNT + 1))
 }
 
-# 検査対象からドキュメントとGate自身を除く。
-# ルール文書は禁止語そのものを説明のために含むため。
+# 検査対象から除くもの。
+# - ドキュメント: ルール文書は禁止語そのものを説明のために含む
+# - Gate自身: 検出パターンを定義しているファイル
+# - lockfile等の生成物: 人が書いたコードではなく、ハッシュ文字列が誤検出を生む
 EXCLUDES=(
   ':(exclude)*.md'
   ':(exclude)scripts/gate.sh'
   ':(exclude)gate.conf'
+  ':(exclude)package-lock.json'
+  ':(exclude)yarn.lock'
+  ':(exclude)pnpm-lock.yaml'
 )
 
 # 追跡ファイルを正規表現で検索する。一致した行を返し、一致が無ければ空を返す。
