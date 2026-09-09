@@ -124,6 +124,8 @@ GATE_BUILD=""
 GATE_MIGRATION=""
 GATE_DEPENDENCY=""
 GATE_ARCHITECTURE=""
+GATE_DUPLICATION=""
+GATE_UNUSED=""
 
 if [ -f gate.conf ]; then
   # shellcheck disable=SC1091
@@ -156,6 +158,8 @@ run_configured 'build'        "$GATE_BUILD"
 run_configured 'migration'    "$GATE_MIGRATION"
 run_configured 'dependency'   "$GATE_DEPENDENCY"
 run_configured 'architecture' "$GATE_ARCHITECTURE"
+run_configured 'duplication'  "$GATE_DUPLICATION"
+run_configured 'unused'       "$GATE_UNUSED"
 
 printf '\n--- 結果 ---\n'
 printf '  PASS %d / FAIL %d / SKIP %d\n' "$PASS_COUNT" "$FAIL_COUNT" "$SKIP_COUNT"
