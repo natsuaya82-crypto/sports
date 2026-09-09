@@ -23,10 +23,32 @@ Expo SDK 57 / React 19 / React Native 0.86 / TypeScript 6。
 | test | `jest` (jest-expo) |
 | build | `expo export`（iOS / Android バンドル生成） |
 | dependency | `npm ci --dry-run`（package.json と lockfile の同期） |
-| architecture | `scripts/check-architecture.sh`（レイヤ境界） |
+| architecture | `scripts/check-architecture.sh`（レイヤ境界）+ eslint `import/no-cycle`（循環依存） |
 | migration | `scripts/check-migrations.sh`（命名規約・破壊的変更の申告・空DBへの適用） |
+| duplication | `jscpd`（重複率1%超で失敗） |
+| unused | `knip`（未使用ファイル・未使用export） |
 
 実際のコマンドは `gate.conf` が唯一の定義箇所。
+
+## 品質ツールの選定
+
+| 目的 | 採用 | 補足 |
+| --- | --- | --- |
+| 重複検出 | jscpd | 閾値は `.jscpd.json`。50トークン・5行以上の重複を1%まで許容 |
+| 未使用コード | knip | 設定は `knip.json` |
+| 循環依存 | eslint `import/no-cycle` | madgeはTypeScript 6に未対応のため採用しない。eslint-config-expoが持つ eslint-plugin-import で代替でき、依存を増やさない |
+| 責務の肥大化 | eslint | `max-lines` / `max-lines-per-function` / `complexity`。domain・data・lib は厳しく、ui はJSXの分だけ緩める |
+
+`knip.json` の `ignoreDependencies` に `expo-updates` を入れている。
+knipのExpoプラグインが `app.json` の `version` から誤検出するもので、実際には使っていない。
+
+## 決定済みだが未導入
+
+| 用途 | 採用 | 導入時期 |
+| --- | --- | --- |
+| validation | zod | 最初にschemaが必要になるTask。理由は docs/DOMAIN.md 第6章 |
+
+不要なdependencyを先に入れないため、決定の記録だけを先に置く。
 
 ## 未確定
 
