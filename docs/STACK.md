@@ -24,7 +24,7 @@ Expo SDK 57 / React 19 / React Native 0.86 / TypeScript 6。
 | build | `expo export`（iOS / Android バンドル生成） |
 | dependency | `npm ci --dry-run`（package.json と lockfile の同期） |
 | architecture | `scripts/check-architecture.sh`（レイヤ境界） |
-| migration | 未設定 |
+| migration | `scripts/check-migrations.sh`（命名規約・破壊的変更の申告・空DBへの適用） |
 
 実際のコマンドは `gate.conf` が唯一の定義箇所。
 
@@ -32,8 +32,6 @@ Expo SDK 57 / React 19 / React Native 0.86 / TypeScript 6。
 
 以下はまだ決めていない。決めるまで実装しない。
 
-- **migration検証**: Supabase CLI の導入方法と、CI で schema 整合性をどう確認するか。
-  最初の migration を追加するTaskで決定し、`gate.conf` の `GATE_MIGRATION` を埋める。
 - **ナビゲーション**: expo-router / React Navigation のどちらか。
   画面が複数になるTaskで、UI prototypeを確認してから決定する。
 - **状態管理**: 追加ライブラリを入れるかどうか。必要になるまで入れない。

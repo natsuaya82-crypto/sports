@@ -10,6 +10,24 @@ jobs:
   gate:
     name: Gate
     runs-on: ubuntu-latest
+
+    # migration の適用チェック用。scripts/check-migrations.sh が DATABASE_URL を使う。
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+
     steps:
       - uses: actions/checkout@v4
         with:
