@@ -5,7 +5,7 @@ import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { makeAuthStyles } from './auth-form';
 
 /** 入力の種類。キーボードと伏せ字の出し分けだけを表す */
-export type AuthFieldKind = 'text' | 'email' | 'password';
+type AuthFieldKind = 'text' | 'email' | 'password';
 
 interface Props {
   label: string;

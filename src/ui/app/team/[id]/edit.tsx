@@ -1,3 +1,4 @@
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -26,11 +27,7 @@ export default function TeamEditMenuScreen() {
 
   if (!team) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>チームが見つかりませんでした</Text>
-        </View>
-      </SafeAreaView>
+      <NotFoundScreen message="チームが見つかりませんでした" />
     );
   }
 
@@ -182,6 +179,4 @@ const makeStyles = (c: Palette) =>
       color: c.textSecondary,
       textAlign: 'center',
     },
-    notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    notFoundText: { fontSize: 14, fontWeight: '700', color: c.text },
   });

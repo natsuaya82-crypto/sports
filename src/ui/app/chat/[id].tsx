@@ -1,3 +1,4 @@
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -30,11 +31,7 @@ export default function ChatScreen() {
 
   if (application === undefined || thread === undefined || opportunity === undefined) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>やりとりが見つかりませんでした</Text>
-        </View>
-      </SafeAreaView>
+      <NotFoundScreen message="やりとりが見つかりませんでした" />
     );
   }
 
@@ -193,15 +190,5 @@ const makeStyles = (c: Palette) =>
     },
     sendDisabled: {
       opacity: 0.4,
-    },
-    notFound: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    notFoundText: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: c.text,
     },
   });

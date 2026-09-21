@@ -1,5 +1,6 @@
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { updateTeam } from '@/data/team-store';
@@ -42,11 +43,7 @@ export default function TeamEditSectionScreen() {
 
   if (!team || !section || !(section in SECTION_TITLES)) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>ページが見つかりませんでした</Text>
-        </View>
-      </SafeAreaView>
+      <NotFoundScreen message="ページが見つかりませんでした" />
     );
   }
 
@@ -72,6 +69,4 @@ export default function TeamEditSectionScreen() {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: c.background },
-    notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    notFoundText: { fontSize: 14, fontWeight: '700', color: c.text },
   });

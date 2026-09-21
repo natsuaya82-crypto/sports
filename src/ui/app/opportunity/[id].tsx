@@ -1,5 +1,6 @@
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FlameIcon } from '@/ui/components/Icons';
@@ -38,14 +39,7 @@ export default function OpportunityDetailScreen() {
 
   if (!opportunity) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>募集が見つかりませんでした</Text>
-          <Pressable onPress={() => router.back()}>
-            <Text style={styles.notFoundBack}>もどる</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      <NotFoundScreen message="募集が見つかりませんでした" showBack />
     );
   }
 
@@ -193,21 +187,5 @@ const makeStyles = (c: Palette) =>
       fontWeight: '800',
       color: c.text,
       marginTop: Spacing.two,
-    },
-    notFound: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: Spacing.two,
-    },
-    notFoundText: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: c.text,
-    },
-    notFoundBack: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: Brand.primary,
     },
   });

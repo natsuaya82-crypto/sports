@@ -1,13 +1,7 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
+import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { compareByOpportunityDate } from '@/ui/components/team/site-format';
@@ -27,7 +21,6 @@ import { Palette, Spacing } from '@/ui/theme';
  * TOPはダイジェスト、詳細は各ページへ。
  */
 export default function TeamSiteScreen() {
-  const router = useRouter();
   const styles = useThemedStyles(makeStyles);
   const site = useThemedStyles(makeSiteStyles);
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -49,14 +42,7 @@ export default function TeamSiteScreen() {
 
   if (!team) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>チームが見つかりませんでした</Text>
-          <Pressable onPress={() => router.back()}>
-            <Text style={styles.notFoundBack}>もどる</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      <NotFoundScreen message="チームが見つかりませんでした" showBack />
     );
   }
 
@@ -93,21 +79,5 @@ const makeStyles = (c: Palette) =>
     },
     pageContent: {
       paddingBottom: Spacing.four,
-    },
-    notFound: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: Spacing.two,
-    },
-    notFoundText: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: c.text,
-    },
-    notFoundBack: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: c.text,
     },
   });

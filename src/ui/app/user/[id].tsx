@@ -1,3 +1,4 @@
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,14 +26,7 @@ export default function UserProfileScreen() {
 
   if (!user) {
     return (
-      <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>プロフィールが見つかりませんでした</Text>
-          <Pressable onPress={() => router.back()}>
-            <Text style={styles.notFoundBack}>もどる</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      <NotFoundScreen message="プロフィールが見つかりませんでした" showBack />
     );
   }
 
@@ -213,7 +207,4 @@ const makeStyles = (c: Palette) =>
     },
     ctaPressed: { backgroundColor: Brand.primaryPressed },
     ctaText: { fontSize: 14, fontWeight: '800', color: Brand.onPrimary },
-    notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.two },
-    notFoundText: { fontSize: 14, fontWeight: '700', color: c.text },
-    notFoundBack: { fontSize: 13, fontWeight: '700', color: Brand.primary },
   });
