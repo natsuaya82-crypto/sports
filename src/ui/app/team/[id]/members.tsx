@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
 import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { Brand, Palette, Spacing } from '@/ui/theme';
@@ -43,7 +43,7 @@ export default function MembersScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScreenHeader title="メンバー管理" />
 
       <FlatList
@@ -67,13 +67,12 @@ export default function MembersScreen() {
           </View>
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
     listContent: { padding: Spacing.three, gap: Spacing.two },
     count: { fontSize: 12, color: c.textSecondary, marginBottom: Spacing.one },
     number: {

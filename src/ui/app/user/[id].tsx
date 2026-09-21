@@ -1,3 +1,5 @@
+import { BottomBar } from '@/ui/components/BottomBar';
+import { Screen } from '@/ui/components/Screen';
 import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -34,7 +36,7 @@ export default function UserProfileScreen() {
   const wantedKinds = user.wantedKinds ?? [];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={[]}>
+    <Screen edges={[]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {/* ヒーロー */}
         <View style={styles.hero}>
@@ -104,20 +106,19 @@ export default function UserProfileScreen() {
       </ScrollView>
 
       {/* スカウトCTA */}
-      <View style={styles.ctaBar}>
+      <BottomBar>
         <Pressable
           style={({ pressed }) => [styles.ctaButton, pressed && styles.ctaPressed]}>
           <Ionicons name="send-outline" size={16} color={Brand.onPrimary} />
           <Text style={styles.ctaText}>この人をスカウトする</Text>
         </Pressable>
-      </View>
-    </SafeAreaView>
+      </BottomBar>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
     scroll: { paddingBottom: 100 },
     hero: { height: 260 },
     heroImage: {
@@ -186,16 +187,6 @@ const makeStyles = (c: Palette) =>
       paddingVertical: 5,
     },
     formText: { fontSize: 12, fontWeight: '700', color: Brand.primary },
-    ctaBar: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      padding: Spacing.three,
-      backgroundColor: c.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: c.border,
-    },
     ctaButton: {
       flexDirection: 'row',
       alignItems: 'center',

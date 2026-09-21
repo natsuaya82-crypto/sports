@@ -1,23 +1,19 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 
-import { FlameIcon, SportIcon } from '@/ui/components/Icons';
-import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
+import { LevelBadge } from '@/ui/components/LevelBadge';
+import { Screen } from '@/ui/components/Screen';
+import { SportIcon } from '@/ui/components/Icons';
+import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
+import { SearchField } from '@/ui/components/search/SearchField';
+import { SelectableChip } from '@/ui/components/SelectableChip';
+import { Palette, Spacing } from '@/ui/theme';
 import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { fetchUsers } from '@/data/user-store';
-import { getLevelLabel } from '@/domain/level';
 import { SPORTS, Sport, getSportLabel } from '@/domain/sport';
 import { getMainSport, hasPublicProfile, type User } from '@/domain/user';
 
@@ -68,11 +64,10 @@ export default function ScoutScreen() {
   }, [query, sport, currentUser.id]);
 
   const renderItem = ({ item }: { item: User }) => (
-    <Pressable
-      style={styles.card}
+    <ListRow
       onPress={() => router.push({ pathname: '/user/[id]', params: { id: item.id } })}>
       <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      <View style={styles.cardBody}>
+      <ListRowBody gap={2}>
         <View style={styles.nameRow}>
           {getMainSport(item) !== undefined && (
             <SportIcon sport={item.sports[0]} size={13} color={colors.text} />
@@ -80,14 +75,12 @@ export default function ScoutScreen() {
           <Text style={styles.name} numberOfLines={1}>
             {item.displayName}
           </Text>
-          <View style={[styles.levelBadge, { borderColor: LevelColors[item.level] }]}>
-            {item.level === 'serious' && (
-              <FlameIcon size={9} color={LevelColors[item.level]} />
-            )}
-            <Text style={[styles.levelText, { color: LevelColors[item.level] }]}>
-              {getLevelLabel(item.level)}
-            </Text>
-          </View>
+          <LevelBadge
+            level={item.level}
+            iconSize={9}
+            style={styles.levelBadge}
+            textStyle={styles.levelText}
+          />
         </View>
         <Text style={styles.meta} numberOfLines={1}>
           {[mainSportLabel(item), item.position, item.ward, item.age]
@@ -99,42 +92,40 @@ export default function ScoutScreen() {
             {item.playStyle}
           </Text>
         )}
-      </View>
-      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-    </Pressable>
+      </ListRowBody>
+      <ListRowChevron />
+    </ListRow>
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>個人をスカウト</Text>
-        <View style={styles.headerSide} />
-      </View>
+    <Screen>
+      <ScreenHeader title="個人をスカウト" />
 
       {/* 検索 */}
-      <View style={styles.searchBar}>
-        <Ionicons name="search" size={16} color={colors.textSecondary} />
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="ポジション・エリア・名前で検索"
-          placeholderTextColor={colors.textSecondary}
-          style={styles.searchInput}
-        />
-      </View>
+      <SearchField
+        value={query}
+        onChangeText={setQuery}
+        placeholder="ポジション・エリア・名前で検索"
+        style={styles.searchBar}
+      />
 
       {/* 競技チップ */}
       <View style={styles.chipRow}>
-        <Chip label="すべて" selected={sport === null} onPress={() => setSport(null)} />
+        <SelectableChip
+          label="すべて"
+          selected={sport === null}
+          onPress={() => setSport(null)}
+          style={styles.chip}
+          selectedTextStyle={styles.chipTextSelected}
+        />
         {SPORTS.map((s) => (
-          <Chip
+          <SelectableChip
             key={s}
             label={getSportLabel(s)}
             selected={sport === s}
             onPress={() => setSport(sport === s ? null : s)}
+            style={styles.chip}
+            selectedTextStyle={styles.chipTextSelected}
           />
         ))}
       </View>
@@ -151,53 +142,13 @@ export default function ScoutScreen() {
           </View>
         }
       />
-    </SafeAreaView>
-  );
-}
-
-function Chip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  const styles = useThemedStyles(makeStyles);
-  return (
-    <Pressable onPress={onPress} style={[styles.chip, selected && styles.chipSelected]}>
-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
-    </Pressable>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: { width: 32, alignItems: 'flex-start' },
-    headerTitle: { fontSize: 15, fontWeight: '700', color: c.text },
-    searchBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      backgroundColor: c.backgroundElement,
-      borderRadius: 10,
-      paddingHorizontal: Spacing.two,
-      marginHorizontal: Spacing.three,
-      marginTop: Spacing.two,
-      height: 38,
-    },
-    searchInput: { flex: 1, fontSize: 13, color: c.text, paddingVertical: 0 },
+    searchBar: { marginTop: Spacing.two },
     chipRow: {
       flexDirection: 'row',
       flexWrap: 'wrap',
@@ -205,27 +156,11 @@ const makeStyles = (c: Palette) =>
       paddingHorizontal: Spacing.three,
       paddingTop: Spacing.two,
     },
-    chip: {
-      borderRadius: 999,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      backgroundColor: c.backgroundElement,
-    },
-    chipSelected: { backgroundColor: Brand.primary },
-    chipText: { fontSize: 12, fontWeight: '600', color: c.text },
-    chipTextSelected: { color: Brand.onPrimary, fontWeight: '700' },
+    chip: { paddingHorizontal: 12, paddingVertical: 6 },
+    chipTextSelected: { fontWeight: '700' },
     listContent: {
       padding: Spacing.three,
       gap: Spacing.two,
-    },
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
     },
     avatar: {
       width: 52,
@@ -233,19 +168,13 @@ const makeStyles = (c: Palette) =>
       borderRadius: 26,
       backgroundColor: c.backgroundElement,
     },
-    cardBody: { flex: 1, gap: 2 },
     nameRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
     name: { flex: 1, fontSize: 14, fontWeight: '700', color: c.text },
     levelBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 2,
-      borderWidth: 1,
-      borderRadius: 999,
       paddingHorizontal: 7,
       paddingVertical: 1,
     },
-    levelText: { fontSize: 9, fontWeight: '700' },
+    levelText: { fontSize: 9 },
     meta: { fontSize: 11, color: c.textSecondary },
     playStyle: { fontSize: 11, color: c.textSecondary },
     empty: { alignItems: 'center', paddingTop: 60 },

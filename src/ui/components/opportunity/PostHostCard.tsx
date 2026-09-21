@@ -1,6 +1,8 @@
 import { View } from 'react-native';
 
-import { Card, Chip, usePostStyles } from './PostFormParts';
+import { SelectableChip } from '@/ui/components/SelectableChip';
+
+import { Card, usePostStyles } from './PostFormParts';
 import type { Team } from '@/domain/team';
 
 interface Props {
@@ -25,14 +27,14 @@ export function PostHostCard({
     <Card icon="person-outline" title="募集主体">
       <View style={styles.chipRow}>
         {myTeams.map((t) => (
-          <Chip
+          <SelectableChip
             key={t.id}
             label={t.name}
             selected={selectedName === t.name}
             onPress={() => onSelect(t.name)}
           />
         ))}
-        <Chip
+        <SelectableChip
           label={`${personalName}(個人)`}
           selected={selectedName === personalName}
           onPress={() => onSelect(personalName)}

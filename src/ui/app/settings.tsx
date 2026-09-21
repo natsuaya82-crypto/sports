@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { RowGroup } from '@/ui/components/row/RowGroup';
 import { SettingRow } from '@/ui/components/row/SettingRow';
@@ -45,7 +45,7 @@ export default function SettingsScreen() {
   const { user, logout } = useAuth();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScreenHeader title="アカウント設定" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -93,13 +93,12 @@ export default function SettingsScreen() {
           />
         </RowGroup>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
     content: { padding: Spacing.three, gap: Spacing.two, paddingBottom: Spacing.six },
     sectionTitle: {
       fontSize: 12,

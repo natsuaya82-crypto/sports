@@ -1,18 +1,17 @@
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet } from 'react-native';
 
+import { ScreenTitle } from '@/ui/components/list/ScreenTitle';
+import { Screen } from '@/ui/components/Screen';
 import { OpportunityGrid } from '@/ui/components/opportunity/OpportunityGrid';
-import { Palette, Spacing } from '@/ui/theme';
-import { useThemedStyles } from '@/ui/contexts/theme-context';
+import { Spacing } from '@/ui/theme';
 import { useFavorites } from '@/ui/hooks/use-favorites';
 import { useOpportunities } from '@/ui/hooks/use-opportunities';
 
 /** おきにいりタブ: ハートを付けた募集の一覧 */
 export default function FavoritesScreen() {
   const router = useRouter();
-  const styles = useThemedStyles(makeStyles);
   const favorites = useFavorites();
   const opportunities = useOpportunities();
 
@@ -22,8 +21,8 @@ export default function FavoritesScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <Text style={styles.screenTitle}>おきにいり</Text>
+    <Screen>
+      <ScreenTitle title="おきにいり" style={styles.screenTitle} />
       <OpportunityGrid
         items={listData}
         favorites={favorites}
@@ -33,22 +32,14 @@ export default function FavoritesScreen() {
         emptyTitle="おきにいりはまだありません"
         emptyHint="募集カードのハートを押すと、ここに保存されます"
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const makeStyles = (c: Palette) =>
-  StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    screenTitle: {
-      fontSize: 18,
-      fontWeight: '800',
-      color: c.text,
-      paddingHorizontal: Spacing.three,
-      paddingTop: Spacing.three,
-      paddingBottom: Spacing.two,
-    },
-  });
+const styles = StyleSheet.create({
+  screenTitle: {
+    paddingHorizontal: Spacing.three,
+    paddingTop: Spacing.three,
+    paddingBottom: Spacing.two,
+  },
+});

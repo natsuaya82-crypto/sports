@@ -1,8 +1,8 @@
+import { Screen } from '@/ui/components/Screen';
 import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { compareByOpportunityDate } from '@/ui/components/team/site-format';
 import { makeSiteStyles } from '@/ui/components/team/site-styles';
@@ -13,7 +13,7 @@ import { TeamSitePage } from '@/ui/components/team/TeamSitePage';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { useOpportunities } from '@/ui/hooks/use-opportunities';
 import { useTeam } from '@/ui/hooks/use-teams';
-import { Palette, Spacing } from '@/ui/theme';
+import { Spacing } from '@/ui/theme';
 
 /**
  * チーム公式サイト。1枚もののプロフィールではなく、
@@ -21,7 +21,6 @@ import { Palette, Spacing } from '@/ui/theme';
  * TOPはダイジェスト、詳細は各ページへ。
  */
 export default function TeamSiteScreen() {
-  const styles = useThemedStyles(makeStyles);
   const site = useThemedStyles(makeSiteStyles);
   const { id } = useLocalSearchParams<{ id: string }>();
   const team = useTeam(id);
@@ -47,7 +46,7 @@ export default function TeamSiteScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={[]}>
+    <Screen edges={[]}>
       <TeamSiteHeader team={team} tab={tab} onSelect={setTab} isDesktop={isDesktop} />
 
       {/* ページ本体 */}
@@ -67,17 +66,12 @@ export default function TeamSiteScreen() {
 
         <TeamSiteFooter team={team} />
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const makeStyles = (c: Palette) =>
-  StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    pageContent: {
-      paddingBottom: Spacing.four,
-    },
-  });
+const styles = StyleSheet.create({
+  pageContent: {
+    paddingBottom: Spacing.four,
+  },
+});

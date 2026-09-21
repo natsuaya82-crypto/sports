@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { Brand, Palette, Spacing } from '@/ui/theme';
+import { BottomBar } from '@/ui/components/BottomBar';
+import { Brand, Palette } from '@/ui/theme';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 
 interface Props {
@@ -23,7 +24,7 @@ export function OpportunityApplyBar({
   const styles = useThemedStyles(makeStyles);
 
   return (
-    <View style={styles.ctaBar}>
+    <BottomBar>
       {isApplied ? (
         <Pressable onPress={onOpenChat} style={[styles.ctaButton, styles.ctaApplied]}>
           <Ionicons name="chatbubble-ellipses-outline" size={16} color={Brand.primary} />
@@ -45,22 +46,12 @@ export function OpportunityApplyBar({
           </Text>
         </Pressable>
       )}
-    </View>
+    </BottomBar>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    ctaBar: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      padding: Spacing.three,
-      backgroundColor: c.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: c.border,
-    },
     ctaButton: {
       flexDirection: 'row',
       alignItems: 'center',

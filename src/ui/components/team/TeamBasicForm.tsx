@@ -6,8 +6,9 @@ import { SPORTS, getSportLabel, type Sport } from '@/domain/sport';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { LevelColors } from '@/ui/theme';
 
+import { SelectableChip } from '@/ui/components/SelectableChip';
+
 import { makeEditFieldStyles, type TeamEditFormProps } from './edit-form';
-import { TeamFormChip } from './TeamFormChip';
 import { TeamFormField } from './TeamFormField';
 import { TeamFormScaffold } from './TeamFormScaffold';
 
@@ -64,7 +65,7 @@ export function TeamBasicForm({ team, onSave }: TeamEditFormProps) {
       <TeamFormField label="競技">
         <View style={styles.chipRow}>
           {SPORTS.map((s) => (
-            <TeamFormChip
+            <SelectableChip
               key={s}
               label={getSportLabel(s)}
               selected={sport === s}
@@ -76,7 +77,7 @@ export function TeamBasicForm({ team, onSave }: TeamEditFormProps) {
       <TeamFormField label="レベル感">
         <View style={styles.chipRow}>
           {LEVELS.map((l) => (
-            <TeamFormChip
+            <SelectableChip
               key={l}
               label={getLevelLabel(l)}
               color={LevelColors[l]}

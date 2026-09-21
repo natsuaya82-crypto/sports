@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -9,8 +8,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { BottomBar } from '@/ui/components/BottomBar';
+import { Screen } from '@/ui/components/Screen';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
+import { SelectableChip } from '@/ui/components/SelectableChip';
 import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
 import { useCurrentUser, useAuth } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
@@ -49,14 +51,8 @@ export default function ProfileEditScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>プロフィールを編集</Text>
-        <View style={styles.headerSide} />
-      </View>
+    <Screen>
+      <ScreenHeader title="プロフィールを編集" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Field label="ニックネーム(必須)">
@@ -85,8 +81,10 @@ export default function ProfileEditScreen() {
         <Field label="やっている種目">
           <View style={styles.chipRow}>
             {SPORTS.map((s) => (
-              <Chip
+              <SelectableChip
                 key={s}
+                style={styles.chip}
+                selectedTextStyle={styles.chipTextSelected}
                 label={getSportLabel(s)}
                 selected={sports.includes(s)}
                 onPress={() => toggleSport(s)}
@@ -98,8 +96,10 @@ export default function ProfileEditScreen() {
         <Field label="レベル感">
           <View style={styles.chipRow}>
             {LEVELS.map((l) => (
-              <Chip
+              <SelectableChip
                 key={l}
+                style={styles.chip}
+                selectedTextStyle={styles.chipTextSelected}
                 label={getLevelLabel(l)}
                 color={LevelColors[l]}
                 selected={level === l}
@@ -110,7 +110,7 @@ export default function ProfileEditScreen() {
         </Field>
       </ScrollView>
 
-      <View style={styles.saveBar}>
+      <BottomBar>
         <Pressable
           onPress={save}
           disabled={!canSave}
@@ -121,8 +121,8 @@ export default function ProfileEditScreen() {
           ]}>
           <Text style={styles.saveText}>保存する</Text>
         </Pressable>
-      </View>
-    </SafeAreaView>
+      </BottomBar>
+    </Screen>
   );
 }
 
@@ -136,41 +136,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function Chip({
-  label,
-  selected,
-  onPress,
-  color,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-  color?: string;
-}) {
-  const styles = useThemedStyles(makeStyles);
-  return (
-    <Pressable
-      onPress={onPress}
-      style={[styles.chip, selected && { backgroundColor: color ?? Brand.primary }]}>
-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: { width: 32, alignItems: 'flex-start' },
-    headerTitle: { fontSize: 15, fontWeight: '700', color: c.text },
     content: { padding: Spacing.three, gap: Spacing.two, paddingBottom: 120 },
     field: { gap: 5 },
     fieldLabel: { fontSize: 12, fontWeight: '700', color: c.text },
@@ -184,24 +151,8 @@ const makeStyles = (c: Palette) =>
     },
     inputMultiline: { minHeight: 90, textAlignVertical: 'top' },
     chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
-    chip: {
-      borderRadius: 999,
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      backgroundColor: c.backgroundElement,
-    },
-    chipText: { fontSize: 12, fontWeight: '600', color: c.text },
-    chipTextSelected: { color: Brand.onPrimary, fontWeight: '700' },
-    saveBar: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      padding: Spacing.three,
-      backgroundColor: c.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: c.border,
-    },
+    chip: { paddingVertical: 8 },
+    chipTextSelected: { fontWeight: '700' },
     saveButton: {
       alignItems: 'center',
       borderRadius: 999,

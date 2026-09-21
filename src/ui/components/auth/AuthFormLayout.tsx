@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 
 import { makeAuthStyles } from './auth-form';
@@ -19,7 +19,7 @@ export function AuthFormLayout({ header, centered, children }: Props) {
   const styles = useThemedStyles(makeAuthStyles);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+    <Screen edges={['top', 'bottom']}>
       {header}
       <KeyboardAvoidingView
         style={styles.flex}
@@ -31,6 +31,6 @@ export function AuthFormLayout({ header, centered, children }: Props) {
           {children}
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Screen>
   );
 }

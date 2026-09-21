@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ScreenTitle } from '@/ui/components/list/ScreenTitle';
+import { Screen } from '@/ui/components/Screen';
 import { ShieldIcon } from '@/ui/components/Icons';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
@@ -17,8 +18,8 @@ export default function MessagesScreen() {
   const threads = useMessageThreads();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <Text style={styles.screenTitle}>メッセージ</Text>
+    <Screen>
+      <ScreenTitle title="メッセージ" style={styles.screenTitle} />
       <FlatList
         data={threads}
         keyExtractor={(item) => item.id}
@@ -32,7 +33,7 @@ export default function MessagesScreen() {
           />
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
@@ -72,14 +73,7 @@ function ThreadRow({ thread }: { thread: MessageThread }) {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
     screenTitle: {
-      fontSize: 18,
-      fontWeight: '800',
-      color: c.text,
       paddingHorizontal: Spacing.three,
       paddingTop: Spacing.three,
       paddingBottom: Spacing.two,

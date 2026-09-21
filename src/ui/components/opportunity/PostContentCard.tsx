@@ -1,6 +1,8 @@
 import { Text, TextInput, View } from 'react-native';
 
-import { Card, Chip, FieldLabel, usePostStyles } from './PostFormParts';
+import { SelectableChip } from '@/ui/components/SelectableChip';
+
+import { Card, FieldLabel, usePostStyles } from './PostFormParts';
 import { POST_KINDS } from './PostFormOptions';
 import { getOpportunityKindColor } from '@/ui/theme';
 import { useAppTheme } from '@/ui/contexts/theme-context';
@@ -36,7 +38,7 @@ export function PostContentCard({
       <FieldLabel text="競技" />
       <View style={styles.chipRow}>
         {SPORTS.map((s) => (
-          <Chip
+          <SelectableChip
             key={s}
             label={getSportLabel(s)}
             selected={sport === s}
@@ -48,7 +50,7 @@ export function PostContentCard({
       <FieldLabel text="募集タイプ" />
       <View style={styles.chipRow}>
         {POST_KINDS.map((k) => (
-          <Chip
+          <SelectableChip
             key={k}
             label={getOpportunityKindLabel(k)}
             color={getOpportunityKindColor(k, colors.tagText)}

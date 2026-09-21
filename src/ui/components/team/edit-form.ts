@@ -63,16 +63,6 @@ export const makeEditFormStyles = (c: Palette) =>
       fontSize: 12,
       color: c.text,
     },
-    saveBar: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 0,
-      padding: Spacing.three,
-      backgroundColor: c.background,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: c.border,
-    },
     saveButton: {
       alignItems: 'center',
       borderRadius: 999,
@@ -134,19 +124,5 @@ export const makeEditFieldStyles = (c: Palette) =>
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: Spacing.two,
-    },
-    chip: {
-      borderRadius: 999,
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-      backgroundColor: c.backgroundElement,
-    },
-    chipText: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: c.text,
-    },
-    chipTextSelected: {
-      color: Brand.onPrimary,
     },
   });

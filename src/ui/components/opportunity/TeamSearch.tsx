@@ -1,11 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { FlatList, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
 
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
+import { SearchField } from '@/ui/components/search/SearchField';
 import { TeamCard } from '@/ui/components/search/TeamCard';
-import { Palette, Spacing } from '@/ui/theme';
-import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { Spacing } from '@/ui/theme';
 import { useTeams } from '@/ui/hooks/use-teams';
 import type { AreaSelection } from '@/domain/area';
 import { isInArea } from '@/domain/area';
@@ -20,8 +19,6 @@ interface Props {
 
 /** チームでさがす: 検索バー+チームカード一覧 */
 export function TeamSearch({ area, sport, onPressTeam }: Props) {
-  const { colors } = useAppTheme();
-  const styles = useThemedStyles(makeStyles);
   const [query, setQuery] = useState('');
   const teams = useTeams();
 
@@ -38,16 +35,12 @@ export function TeamSearch({ area, sport, onPressTeam }: Props) {
 
   return (
     <>
-      <View style={styles.searchBar}>
-        <Ionicons name="search" size={16} color={colors.textSecondary} />
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="チーム名・エリアで検索"
-          placeholderTextColor={colors.textSecondary}
-          style={styles.searchInput}
-        />
-      </View>
+      <SearchField
+        value={query}
+        onChangeText={setQuery}
+        placeholder="チーム名・エリアで検索"
+        style={styles.searchBar}
+      />
       <FlatList
         style={styles.list}
         data={listData}
@@ -68,33 +61,18 @@ export function TeamSearch({ area, sport, onPressTeam }: Props) {
   );
 }
 
-const makeStyles = (c: Palette) =>
-  StyleSheet.create({
-    // リスト側だけを伸縮させ、検索バーを潰さない
-    list: {
-      flex: 1,
-    },
-    teamListContent: {
-      gap: Spacing.two,
-      paddingHorizontal: Spacing.three,
-      paddingTop: Spacing.two,
-      paddingBottom: 88,
-    },
-    searchBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      backgroundColor: c.backgroundElement,
-      borderRadius: 10,
-      paddingHorizontal: Spacing.two,
-      marginHorizontal: Spacing.three,
-      marginTop: Spacing.two,
-      height: 38,
-    },
-    searchInput: {
-      flex: 1,
-      fontSize: 13,
-      color: c.text,
-      paddingVertical: 0,
-    },
-  });
+const styles = StyleSheet.create({
+  // リスト側だけを伸縮させ、検索バーを潰さない
+  list: {
+    flex: 1,
+  },
+  teamListContent: {
+    gap: Spacing.two,
+    paddingHorizontal: Spacing.three,
+    paddingTop: Spacing.two,
+    paddingBottom: 88,
+  },
+  searchBar: {
+    marginTop: Spacing.two,
+  },
+});

@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { SearchField } from '@/ui/components/search/SearchField';
 import { BottomSheet } from '@/ui/components/sheet/BottomSheet';
 import { Brand, Palette, Spacing } from '@/ui/theme';
-import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { fetchLocations } from '@/data/location-store';
 import type { Location } from '@/domain/location';
 
@@ -16,7 +17,6 @@ interface Props {
 
 /** 会場を検索して候補から選ぶボトムシート(本番は場所検索APIに置き換える想定) */
 export function VenueSheet({ visible, onClose, onSelect }: Props) {
-  const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   const [query, setQuery] = useState('');
   const venues = fetchLocations();
@@ -41,17 +41,13 @@ export function VenueSheet({ visible, onClose, onSelect }: Props) {
 
   return (
     <BottomSheet visible={visible} title="会場を選ぶ" onClose={onClose} height="75%">
-      <View style={styles.searchBar}>
-        <Ionicons name="search" size={16} color={colors.textSecondary} />
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="会場名・エリアで検索(全国)"
-          placeholderTextColor={colors.textSecondary}
-          style={styles.searchInput}
-          autoFocus
-        />
-      </View>
+      <SearchField
+        value={query}
+        onChangeText={setQuery}
+        placeholder="会場名・エリアで検索(全国)"
+        autoFocus
+        style={styles.searchBar}
+      />
 
       <ScrollView
         style={styles.scroll}
@@ -88,21 +84,7 @@ export function VenueSheet({ visible, onClose, onSelect }: Props) {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     searchBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      backgroundColor: c.backgroundElement,
-      borderRadius: 10,
-      paddingHorizontal: Spacing.two,
-      marginHorizontal: Spacing.three,
       marginBottom: Spacing.two,
-      height: 38,
-    },
-    searchInput: {
-      flex: 1,
-      fontSize: 13,
-      color: c.text,
-      paddingVertical: 0,
     },
     scroll: {
       flex: 1,

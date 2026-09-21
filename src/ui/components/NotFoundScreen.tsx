@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 
@@ -23,7 +23,7 @@ export function NotFoundScreen({ message, showBack = false }: Props) {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <View style={styles.notFound}>
         <Text style={styles.notFoundText}>{message}</Text>
         {showBack && (
@@ -32,13 +32,12 @@ export function NotFoundScreen({ message, showBack = false }: Props) {
           </Pressable>
         )}
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
     notFound: {
       flex: 1,
       alignItems: 'center',

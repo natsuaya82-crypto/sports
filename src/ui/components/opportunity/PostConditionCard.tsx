@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 
-import { Card, Chip, FieldLabel, SelectorRow, usePostStyles } from './PostFormParts';
+import { SelectableChip } from '@/ui/components/SelectableChip';
+
+import { Card, FieldLabel, SelectorRow, usePostStyles } from './PostFormParts';
 import { feeLabel, type PostSheetKey } from './PostFormOptions';
 import { LevelColors } from '@/ui/theme';
 import { useAppTheme } from '@/ui/contexts/theme-context';
@@ -42,7 +44,7 @@ export function PostConditionCard({
       <FieldLabel text="レベル" />
       <View style={styles.chipRow}>
         {LEVELS.map((l) => (
-          <Chip
+          <SelectableChip
             key={l}
             label={getLevelLabel(l)}
             color={LevelColors[l]}

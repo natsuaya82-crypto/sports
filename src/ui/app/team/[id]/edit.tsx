@@ -1,8 +1,8 @@
+import { Screen } from '@/ui/components/Screen';
 import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { RowGroup } from '@/ui/components/row/RowGroup';
@@ -89,7 +89,7 @@ export default function TeamEditMenuScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScreenHeader title="公式サイトを編集" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -136,13 +136,12 @@ export default function TeamEditMenuScreen() {
           メンバーと試合日程・結果の編集は「メンバー管理」から行えるようにする予定です
         </Text>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
     content: { padding: Spacing.three, gap: Spacing.three },
     preview: {
       borderRadius: 12,

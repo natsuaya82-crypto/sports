@@ -2,8 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ScreenTitle } from '@/ui/components/list/ScreenTitle';
+import { Screen } from '@/ui/components/Screen';
 import { ManagedTeamRow } from '@/ui/components/profile/ManagedTeamRow';
 import { ProfileSummary } from '@/ui/components/profile/ProfileSummary';
 import { Brand, Palette, Spacing } from '@/ui/theme';
@@ -49,9 +50,9 @@ export default function MyPageScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.screenTitle}>マイページ</Text>
+        <ScreenTitle title="マイページ" />
 
         {/* 自分のプロフィール */}
         <ProfileSummary user={user} onEdit={() => router.push('/profile-edit')} />
@@ -88,25 +89,16 @@ export default function MyPageScreen() {
           </Pressable>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
     content: {
       padding: Spacing.three,
       gap: Spacing.two,
       paddingBottom: 88,
-    },
-    screenTitle: {
-      fontSize: 18,
-      fontWeight: '800',
-      color: c.text,
     },
     menuList: {
       borderWidth: StyleSheet.hairlineWidth,

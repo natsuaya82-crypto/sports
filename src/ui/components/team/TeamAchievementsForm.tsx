@@ -1,22 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, TextInput, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import { Brand } from '@/ui/theme';
+import { useThemedStyles } from '@/ui/contexts/theme-context';
 
-import {
-  makeEditFieldStyles,
-  makeEditFormStyles,
-  type TeamEditFormProps,
-} from './edit-form';
+import { makeEditFormStyles, type TeamEditFormProps } from './edit-form';
+import { TeamFormAddRow, TeamFormDeleteButton } from './TeamFormAddRow';
 import { TeamFormScaffold } from './TeamFormScaffold';
 
 /** 実績 */
 export function TeamAchievementsForm({ team, onSave }: TeamEditFormProps) {
-  const { colors } = useAppTheme();
   const styles = useThemedStyles(makeEditFormStyles);
-  const field = useThemedStyles(makeEditFieldStyles);
   const [achievements, setAchievements] = useState<string[]>(team.achievements ?? []);
   const [draft, setDraft] = useState('');
 
@@ -34,20 +27,12 @@ export function TeamAchievementsForm({ team, onSave }: TeamEditFormProps) {
       onSave={() =>
         onSave({ achievements: achievements.length > 0 ? achievements : undefined })
       }>
-      <View style={styles.addRow}>
-        <TextInput
-          value={draft}
-          onChangeText={setDraft}
-          placeholder="例: 区民大会 ベスト4(2025)"
-          placeholderTextColor={colors.textSecondary}
-          style={[field.input, styles.addInput]}
-        />
-        <Pressable
-          onPress={add}
-          style={[styles.addButton, !draft.trim() && styles.addButtonDisabled]}>
-          <Text style={styles.addButtonText}>追加</Text>
-        </Pressable>
-      </View>
+      <TeamFormAddRow
+        value={draft}
+        onChangeText={setDraft}
+        placeholder="例: 区民大会 ベスト4(2025)"
+        onAdd={add}
+      />
       {achievements.length === 0 && (
         <Text style={styles.sectionHint}>
           戦績がなくてもサイトは成立します(戦績ページが非表示になるだけ)
@@ -58,11 +43,9 @@ export function TeamAchievementsForm({ team, onSave }: TeamEditFormProps) {
           <Text style={styles.listRowText} numberOfLines={2}>
             {a}
           </Text>
-          <Pressable
+          <TeamFormDeleteButton
             onPress={() => setAchievements((prev) => prev.filter((_, j) => j !== i))}
-            hitSlop={8}>
-            <Ionicons name="trash-outline" size={16} color={Brand.danger} />
-          </Pressable>
+          />
         </View>
       ))}
     </TeamFormScaffold>

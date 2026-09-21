@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 
@@ -65,7 +65,6 @@ const GROUPS: { title: string; items: Toggle[] }[] = [
 
 /** 通知設定 */
 export default function NotificationsScreen() {
-  const router = useRouter();
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
 
@@ -76,18 +75,8 @@ export default function NotificationsScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Ionicons
-          name="chevron-back"
-          size={22}
-          color={colors.text}
-          onPress={() => router.back()}
-          style={styles.back}
-        />
-        <Text style={styles.headerTitle}>通知設定</Text>
-        <View style={styles.back} />
-      </View>
+    <Screen>
+      <ScreenHeader title="通知設定" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {GROUPS.map((g) => (
@@ -115,24 +104,12 @@ export default function NotificationsScreen() {
           </View>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    back: { width: 32 },
-    headerTitle: { fontSize: 15, fontWeight: '700', color: c.text },
     content: { padding: Spacing.three, gap: Spacing.three },
     group: { gap: Spacing.two },
     groupTitle: { fontSize: 12, fontWeight: '700', color: c.textSecondary },

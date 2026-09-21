@@ -1,10 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { SportIcon } from '@/ui/components/Icons';
+import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
 import type { Palette } from '@/ui/theme';
-import { Brand, Spacing } from '@/ui/theme';
+import { Brand } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { getOpportunityKindLabel } from '@/domain/opportunity';
 import type { Team } from '@/domain/team';
@@ -14,9 +14,9 @@ export function ManagedTeamRow({ team, onPress }: { team: Team; onPress: () => v
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   return (
-    <Pressable style={styles.teamRow} onPress={onPress}>
+    <ListRow onPress={onPress}>
       <Image source={{ uri: team.photo }} style={styles.teamPhoto} />
-      <View style={styles.teamBody}>
+      <ListRowBody gap={3}>
         <View style={styles.teamNameRow}>
           <SportIcon sport={team.sport} size={13} color={colors.text} />
           <Text style={styles.teamName} numberOfLines={1}>
@@ -33,32 +33,19 @@ export function ManagedTeamRow({ team, onPress }: { team: Team; onPress: () => v
             </View>
           )}
         </View>
-      </View>
-      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-    </Pressable>
+      </ListRowBody>
+      <ListRowChevron />
+    </ListRow>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    teamRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
-    },
     teamPhoto: {
       width: 44,
       height: 44,
       borderRadius: 10,
       backgroundColor: c.backgroundElement,
-    },
-    teamBody: {
-      flex: 1,
-      gap: 3,
     },
     teamNameRow: {
       flexDirection: 'row',

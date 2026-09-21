@@ -1,10 +1,9 @@
-import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { updateTeam } from '@/data/team-store';
 import type { Team } from '@/domain/team';
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
+import { Screen } from '@/ui/components/Screen';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { TeamAchievementsForm } from '@/ui/components/team/TeamAchievementsForm';
 import { TeamActivityForm } from '@/ui/components/team/TeamActivityForm';
@@ -12,9 +11,7 @@ import { TeamBasicForm } from '@/ui/components/team/TeamBasicForm';
 import { TeamColorForm } from '@/ui/components/team/TeamColorForm';
 import { TeamNewsForm } from '@/ui/components/team/TeamNewsForm';
 import { TeamRecruitingForm } from '@/ui/components/team/TeamRecruitingForm';
-import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { useTeam } from '@/ui/hooks/use-teams';
-import { Palette } from '@/ui/theme';
 
 /** 編集画面のセクション */
 export type EditSection =
@@ -37,7 +34,6 @@ const SECTION_TITLES: Record<EditSection, string> = {
 /** 項目ごとの編集画面(編集メニューから遷移) */
 export default function TeamEditSectionScreen() {
   const router = useRouter();
-  const styles = useThemedStyles(makeStyles);
   const { id, section } = useLocalSearchParams<{ id: string; section: EditSection }>();
   const team = useTeam(id);
 
@@ -53,7 +49,7 @@ export default function TeamEditSectionScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScreenHeader title={SECTION_TITLES[section]} />
 
       {section === 'basic' && <TeamBasicForm team={team} onSave={save} />}
@@ -62,11 +58,6 @@ export default function TeamEditSectionScreen() {
       {section === 'recruiting' && <TeamRecruitingForm team={team} onSave={save} />}
       {section === 'news' && <TeamNewsForm team={team} onSave={save} />}
       {section === 'achievements' && <TeamAchievementsForm team={team} onSave={save} />}
-    </SafeAreaView>
+    </Screen>
   );
 }
-
-const makeStyles = (c: Palette) =>
-  StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
-  });

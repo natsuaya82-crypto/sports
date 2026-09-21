@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text } from 'react-native';
 
+import { BottomBar } from '@/ui/components/BottomBar';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 
 import { makeEditFormStyles } from './edit-form';
@@ -25,7 +26,7 @@ export function TeamFormScaffold({
         showsVerticalScrollIndicator={false}>
         {children}
       </ScrollView>
-      <View style={styles.saveBar}>
+      <BottomBar>
         <Pressable
           onPress={onSave}
           disabled={!canSave}
@@ -37,7 +38,7 @@ export function TeamFormScaffold({
           ]}>
           <Text style={styles.saveText}>保存する</Text>
         </Pressable>
-      </View>
+      </BottomBar>
     </>
   );
 }

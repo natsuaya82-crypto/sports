@@ -13,7 +13,8 @@ import {
   makeEditFormStyles,
   type TeamEditFormProps,
 } from './edit-form';
-import { TeamFormChip } from './TeamFormChip';
+import { SelectableChip } from '@/ui/components/SelectableChip';
+
 import { TeamFormScaffold } from './TeamFormScaffold';
 
 /** 募集種別 */
@@ -40,7 +41,7 @@ export function TeamRecruitingForm({ team, onSave }: TeamEditFormProps) {
       </Text>
       <View style={styles.chipRow}>
         {SUPPORTED_OPPORTUNITY_KINDS.map((t) => (
-          <TeamFormChip
+          <SelectableChip
             key={t}
             label={getOpportunityKindLabel(t)}
             selected={recruitingKinds.includes(t)}

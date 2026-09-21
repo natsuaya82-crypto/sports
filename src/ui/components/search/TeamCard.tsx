@@ -2,10 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { FlameIcon, SportIcon } from '@/ui/components/Icons';
-import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
+import { LevelBadge } from '@/ui/components/LevelBadge';
+import { SportIcon } from '@/ui/components/Icons';
+import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import { getLevelLabel } from '@/domain/level';
 import { getOpportunityKindLabel } from '@/domain/opportunity';
 import { getSportLabel } from '@/domain/sport';
 import type { Team } from '@/domain/team';
@@ -53,14 +53,12 @@ export function TeamCard({ team, onPress }: Props) {
         </Text>
 
         <View style={styles.badgeRow}>
-          <View style={[styles.levelBadge, { borderColor: LevelColors[team.level] }]}>
-            {team.level === 'serious' && (
-              <FlameIcon size={10} color={LevelColors[team.level]} />
-            )}
-            <Text style={[styles.levelText, { color: LevelColors[team.level] }]}>
-              {getLevelLabel(team.level)}
-            </Text>
-          </View>
+          <LevelBadge
+            level={team.level}
+            iconSize={10}
+            style={styles.levelBadge}
+            textStyle={styles.levelText}
+          />
           {team.recruitingKinds.length > 0 ? (
             team.recruitingKinds.map((r) => (
               <View key={r} style={styles.recruitBadge}>
@@ -130,17 +128,11 @@ const makeStyles = (c: Palette) =>
       marginTop: 2,
     },
     levelBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 2,
-      borderWidth: 1,
-      borderRadius: 999,
       paddingHorizontal: 7,
       paddingVertical: 1,
     },
     levelText: {
       fontSize: 10,
-      fontWeight: '700',
     },
     recruitBadge: {
       backgroundColor: c.primarySoft,

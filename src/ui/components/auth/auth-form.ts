@@ -8,10 +8,6 @@ import { Brand, Palette, Spacing } from '@/ui/theme';
  */
 export const makeAuthStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
     flex: {
       flex: 1,
     },

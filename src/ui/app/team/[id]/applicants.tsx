@@ -2,12 +2,12 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { findUser } from '@/data/user-store';
 import type { Application, ApplicationStatus } from '@/domain/application';
 import { getApplicationsForOpportunity } from '@/domain/application';
 import type { Opportunity } from '@/domain/opportunity';
+import { Screen } from '@/ui/components/Screen';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
@@ -99,7 +99,7 @@ export default function ApplicantsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScreenHeader title="応募者の確認" />
 
       {team && (
@@ -121,13 +121,12 @@ export default function ApplicantsScreen() {
           />
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
     subheader: {
       fontSize: 12,
       color: c.textSecondary,

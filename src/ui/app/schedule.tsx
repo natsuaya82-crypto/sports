@@ -2,8 +2,8 @@ import { formatSlashDateWithWeekday } from '@/lib/local-date';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
 import { SportIcon } from '@/ui/components/Icons';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
@@ -128,7 +128,7 @@ export default function ScheduleScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScreenHeader title="参加予定" />
 
       <FlatList
@@ -144,13 +144,12 @@ export default function ScheduleScreen() {
           />
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: { flex: 1, backgroundColor: c.background },
     listContent: { padding: Spacing.three, gap: Spacing.two },
     dateCol: { width: 58, alignItems: 'center', gap: 2 },
     dateText: { fontSize: 12, fontWeight: '800', color: c.text },

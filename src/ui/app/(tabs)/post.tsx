@@ -1,8 +1,9 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet } from 'react-native';
 
+import { ScreenTitle } from '@/ui/components/list/ScreenTitle';
+import { Screen } from '@/ui/components/Screen';
 import { PostConditionCard } from '@/ui/components/opportunity/PostConditionCard';
 import { PostContentCard } from '@/ui/components/opportunity/PostContentCard';
 import {
@@ -17,8 +18,7 @@ import { PostScheduleCard } from '@/ui/components/opportunity/PostScheduleCard';
 import { PostSheets } from '@/ui/components/opportunity/PostSheets';
 import { PostSubmitFooter } from '@/ui/components/opportunity/PostSubmitFooter';
 import { PostVenueCard } from '@/ui/components/opportunity/PostVenueCard';
-import { Palette, Spacing } from '@/ui/theme';
-import { useThemedStyles } from '@/ui/contexts/theme-context';
+import { Spacing } from '@/ui/theme';
 import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useTeams } from '@/ui/hooks/use-teams';
 import { createOpportunity } from '@/data/opportunity-store';
@@ -31,7 +31,6 @@ import { getDateFromToday } from '@/lib/local-date';
 
 export default function PostScreen() {
   const router = useRouter();
-  const styles = useThemedStyles(makeStyles);
 
   const dates = useMemo(
     () => Array.from({ length: DAYS_TO_SHOW }, (_, i) => getDateFromToday(i)),
@@ -101,11 +100,11 @@ export default function PostScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}>
-        <Text style={styles.screenTitle}>募集をつくる</Text>
+        <ScreenTitle title="募集をつくる" />
 
         <PostContentCard
           sport={sport}
@@ -176,25 +175,15 @@ export default function PostScreen() {
         fee={fee}
         onSelectFee={setFee}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const makeStyles = (c: Palette) =>
-  StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    content: {
-      paddingHorizontal: Spacing.three,
-      paddingTop: Spacing.two,
-      paddingBottom: 96,
-      gap: Spacing.three,
-    },
-    screenTitle: {
-      fontSize: 18,
-      fontWeight: '800',
-      color: c.text,
-    },
-  });
+const styles = StyleSheet.create({
+  content: {
+    paddingHorizontal: Spacing.three,
+    paddingTop: Spacing.two,
+    paddingBottom: 96,
+    gap: Spacing.three,
+  },
+});

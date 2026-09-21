@@ -1,14 +1,14 @@
+import { LevelBadge } from '@/ui/components/LevelBadge';
+import { Screen } from '@/ui/components/Screen';
 import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { FlameIcon } from '@/ui/components/Icons';
 import { OpportunityApplyBar } from '@/ui/components/opportunity/OpportunityApplyBar';
 import { OpportunityHero } from '@/ui/components/opportunity/OpportunityHero';
 import { OpportunityHostRow } from '@/ui/components/opportunity/OpportunityHostRow';
 import { OpportunityInfoCard } from '@/ui/components/opportunity/OpportunityInfoCard';
-import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
+import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useApplications } from '@/ui/hooks/use-applications';
@@ -19,7 +19,6 @@ import { createApplication } from '@/data/application-store';
 import { toggleFavorite } from '@/data/favorite-store';
 import { createThread } from '@/data/message-store';
 import { getApplicationsByApplicant } from '@/domain/application';
-import { getLevelLabel } from '@/domain/level';
 import { getRemainingCapacity, isOpen } from '@/domain/opportunity';
 
 /** 応募時に自動で送られる1通目(prototypeの文言) */
@@ -66,7 +65,7 @@ export default function OpportunityDetailScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={[]}>
+    <Screen edges={[]}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <OpportunityHero
           opportunity={opportunity}
@@ -79,14 +78,12 @@ export default function OpportunityDetailScreen() {
           <Text style={styles.title}>{opportunity.title}</Text>
 
           <View style={styles.badgeRow}>
-            <View style={[styles.levelBadge, { borderColor: LevelColors[opportunity.level] }]}>
-              {opportunity.level === 'serious' && (
-                <FlameIcon size={11} color={LevelColors[opportunity.level]} />
-              )}
-              <Text style={[styles.levelText, { color: LevelColors[opportunity.level] }]}>
-                {getLevelLabel(opportunity.level)}
-              </Text>
-            </View>
+            <LevelBadge
+              level={opportunity.level}
+              iconSize={11}
+              style={styles.levelBadge}
+              textStyle={styles.levelText}
+            />
             {isClosed ? (
               <View style={styles.closedBadge}>
                 <Text style={styles.closedBadgeText}>締切</Text>
@@ -122,16 +119,12 @@ export default function OpportunityDetailScreen() {
           if (application !== undefined) openChat(application.id);
         }}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
     scroll: {
       paddingBottom: 104,
     },
@@ -151,17 +144,11 @@ const makeStyles = (c: Palette) =>
       gap: Spacing.two,
     },
     levelBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 2,
-      borderWidth: 1,
-      borderRadius: 999,
       paddingHorizontal: 9,
       paddingVertical: 3,
     },
     levelText: {
       fontSize: 11,
-      fontWeight: '700',
     },
     remaining: {
       fontSize: 12,

@@ -2,11 +2,11 @@ import { formatMonthDay } from '@/lib/local-date';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { FlameIcon, ShieldIcon } from '@/ui/components/Icons';
+import { LevelBadge } from '@/ui/components/LevelBadge';
+import { ShieldIcon } from '@/ui/components/Icons';
 import { OpportunityCardPhoto } from '@/ui/components/search/OpportunityCardPhoto';
-import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
+import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import { getLevelLabel } from '@/domain/level';
 import {
   Opportunity,
   getEndTime,
@@ -66,14 +66,12 @@ export function OpportunityCard({ item, isFavorite, onToggleFavorite, onPress }:
         </View>
 
         <View style={styles.metaRow}>
-          <View style={[styles.levelBadge, { borderColor: LevelColors[item.level] }]}>
-            {item.level === 'serious' && (
-              <FlameIcon size={10} color={LevelColors[item.level]} />
-            )}
-            <Text style={[styles.levelText, { color: LevelColors[item.level] }]}>
-              {getLevelLabel(item.level)}
-            </Text>
-          </View>
+          <LevelBadge
+            level={item.level}
+            iconSize={10}
+            style={styles.levelBadge}
+            textStyle={styles.levelText}
+          />
           {!isClosed && (
             <Text style={[styles.remaining, remaining <= 2 && styles.remainingFew]}>
               残り{remaining}枠
@@ -154,17 +152,11 @@ const makeStyles = (c: Palette) =>
       justifyContent: 'space-between',
     },
     levelBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 2,
-      borderWidth: 1,
-      borderRadius: 999,
       paddingHorizontal: 8,
       paddingVertical: 2,
     },
     levelText: {
       fontSize: 10,
-      fontWeight: '700',
     },
     remaining: {
       fontSize: 11,

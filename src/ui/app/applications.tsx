@@ -1,8 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
@@ -25,7 +25,7 @@ export default function ApplicationsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       <ScreenHeader title="応募履歴" />
       <FlatList
         data={myApplications}
@@ -40,7 +40,7 @@ export default function ApplicationsScreen() {
           />
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
@@ -79,10 +79,6 @@ function ApplicationRow({ application }: { application: Application }) {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
     listContent: {
       padding: Spacing.three,
       gap: Spacing.two,

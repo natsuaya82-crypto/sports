@@ -1,8 +1,8 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen } from '@/ui/components/Screen';
 import { DateSearch } from '@/ui/components/opportunity/DateSearch';
 import { TeamSearch } from '@/ui/components/opportunity/TeamSearch';
 import { AreaHeader } from '@/ui/components/search/AreaHeader';
@@ -10,15 +10,13 @@ import { AreaSheet } from '@/ui/components/search/AreaSheet';
 import { FilterFab } from '@/ui/components/search/FilterFab';
 import { ModeToggle, SearchMode } from '@/ui/components/search/ModeToggle';
 import { SportSelectButton, SportSheet } from '@/ui/components/search/SportSelect';
-import { Palette, Spacing } from '@/ui/theme';
-import { useThemedStyles } from '@/ui/contexts/theme-context';
+import { Spacing } from '@/ui/theme';
 import { DEFAULT_AREA, getAreaLabel } from '@/domain/area';
 import { countActiveFilters, DEFAULT_FILTER } from '@/domain/opportunity-filter';
 import type { Sport } from '@/domain/sport';
 
 export default function SearchScreen() {
   const router = useRouter();
-  const styles = useThemedStyles(makeStyles);
   const [mode, setMode] = useState<SearchMode>('date');
   const [area, setArea] = useState(DEFAULT_AREA);
   const [areaOpen, setAreaOpen] = useState(false);
@@ -29,7 +27,7 @@ export default function SearchScreen() {
   const [sportOpen, setSportOpen] = useState(false);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       {/* エリア+競技プルダウン+絞りこみ(均等3ボタン) */}
       <View style={styles.headerRow}>
         <AreaHeader area={getAreaLabel(area)} onPress={() => setAreaOpen(true)} />
@@ -72,16 +70,11 @@ export default function SearchScreen() {
         onClose={() => setAreaOpen(false)}
         onApply={setArea}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const makeStyles = (c: Palette) =>
-  StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
+const styles = StyleSheet.create({
     // 最上段: 左にエリアバー、右に絞りこみ
     headerRow: {
       flexDirection: 'row',
@@ -90,4 +83,4 @@ const makeStyles = (c: Palette) =>
       paddingHorizontal: Spacing.three,
       marginTop: Spacing.two,
     },
-  });
+});

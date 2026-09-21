@@ -1,9 +1,9 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { ShieldIcon } from '@/ui/components/Icons';
-import { Palette, Spacing } from '@/ui/theme';
+import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
+import { Palette } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import type { Opportunity } from '@/domain/opportunity';
 import type { Team } from '@/domain/team';
@@ -21,9 +21,7 @@ export function OpportunityHostRow({ opportunity, team, onPressTeam }: Props) {
   const styles = useThemedStyles(makeStyles);
 
   return (
-    <Pressable
-      style={styles.teamRow}
-      onPress={team ? () => onPressTeam(team.id) : undefined}>
+    <ListRow onPress={team ? () => onPressTeam(team.id) : undefined}>
       {team ? (
         <Image source={{ uri: team.photo }} style={styles.teamPhoto} contentFit="cover" />
       ) : (
@@ -31,28 +29,19 @@ export function OpportunityHostRow({ opportunity, team, onPressTeam }: Props) {
           <ShieldIcon size={18} color={colors.textSecondary} />
         </View>
       )}
-      <View style={styles.teamBody}>
+      <ListRowBody gap={1}>
         <Text style={styles.teamName}>{opportunity.hostTeamName}</Text>
         <Text style={styles.teamHint}>
           {team ? '公式サイトを見る' : 'このアプリで募集中'}
         </Text>
-      </View>
-      {team && <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />}
-    </Pressable>
+      </ListRowBody>
+      {team && <ListRowChevron />}
+    </ListRow>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    teamRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
-    },
     teamPhoto: {
       width: 44,
       height: 44,
@@ -66,10 +55,6 @@ const makeStyles = (c: Palette) =>
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: c.backgroundElement,
-    },
-    teamBody: {
-      flex: 1,
-      gap: 1,
     },
     teamName: {
       fontSize: 14,

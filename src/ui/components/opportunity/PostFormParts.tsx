@@ -2,30 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Brand, Palette, Spacing } from '@/ui/theme';
+import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-
-/** 選択チップ。選択中だけ色が塗られる */
-export function Chip({
-  label,
-  selected,
-  onPress,
-  color,
-}: {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-  color?: string;
-}) {
-  const styles = usePostStyles();
-  return (
-    <Pressable
-      onPress={onPress}
-      style={[styles.chip, selected && { backgroundColor: color ?? Brand.primary }]}>
-      <Text style={[styles.chipText, selected && styles.chipTextSelected]}>{label}</Text>
-    </Pressable>
-  );
-}
 
 /** カード型のセクション(アイコン+見出し) */
 export function Card({
@@ -115,20 +93,6 @@ const makeStyles = (c: Palette) =>
       flexDirection: 'row',
       flexWrap: 'wrap',
       gap: Spacing.two,
-    },
-    chip: {
-      borderRadius: 999,
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-      backgroundColor: c.backgroundElement,
-    },
-    chipText: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: c.text,
-    },
-    chipTextSelected: {
-      color: Brand.onPrimary,
     },
     input: {
       backgroundColor: c.backgroundElement,

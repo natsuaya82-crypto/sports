@@ -1,4 +1,3 @@
-import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -10,8 +9,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
+import { Screen } from '@/ui/components/Screen';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { useApplications, useMessageThreads } from '@/ui/hooks/use-applications';
@@ -43,7 +43,7 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top']}>
+    <Screen>
       {/* ヘッダー */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
@@ -95,16 +95,12 @@ export default function ChatScreen() {
           <Ionicons name="arrow-up" size={18} color={Brand.onPrimary} />
         </Pressable>
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
