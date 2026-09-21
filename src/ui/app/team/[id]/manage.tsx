@@ -6,7 +6,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SportIcon } from '@/ui/components/Icons';
-import { Brand, Palette, Spacing } from '@/ui/theme';
+import { TeamManageRow } from '@/ui/components/team/TeamManageRow';
+import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { getSportLabel } from '@/domain/sport';
 import { useOpportunities } from '@/ui/hooks/use-opportunities';
@@ -94,29 +95,29 @@ export default function TeamManageScreen() {
         {/* 管理メニュー */}
         <Text style={styles.sectionTitle}>運営</Text>
         <View style={styles.menuList}>
-          <ManageRow
+          <TeamManageRow
             icon="megaphone-outline"
             label="募集をつくる・管理"
             note={`${activeCount}件`}
             onPress={() => go('/post')}
           />
-          <ManageRow
+          <TeamManageRow
             icon="mail-open-outline"
             label="応募者の確認"
             badge="新着 2"
             onPress={() => go('/team/[id]/applicants')}
           />
-          <ManageRow
+          <TeamManageRow
             icon="search-outline"
             label="個人をスカウト"
             onPress={() => go('/scout')}
           />
-          <ManageRow
+          <TeamManageRow
             icon="people-outline"
             label="メンバー管理"
             onPress={() => go('/team/[id]/members')}
           />
-          <ManageRow
+          <TeamManageRow
             icon="settings-outline"
             label="チーム設定"
             onPress={() => go('/team/[id]/edit')}
@@ -126,38 +127,6 @@ export default function TeamManageScreen() {
 
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function ManageRow({
-  icon,
-  label,
-  note,
-  badge,
-  onPress,
-  last,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  note?: string;
-  badge?: string;
-  onPress?: () => void;
-  last?: boolean;
-}) {
-  const { colors } = useAppTheme();
-  const styles = useThemedStyles(makeStyles);
-  return (
-    <Pressable style={[styles.menuItem, last && styles.menuItemLast]} onPress={onPress}>
-      <Ionicons name={icon} size={18} color={colors.text} />
-      <Text style={styles.menuLabel}>{label}</Text>
-      {note && <Text style={styles.menuNote}>{note}</Text>}
-      {badge && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{badge}</Text>
-        </View>
-      )}
-      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-    </Pressable>
   );
 }
 
@@ -266,39 +235,6 @@ const makeStyles = (c: Palette) =>
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: c.border,
       borderRadius: 12,
-    },
-    menuItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      paddingHorizontal: Spacing.three,
-      paddingVertical: 14,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    menuItemLast: {
-      borderBottomWidth: 0,
-    },
-    menuLabel: {
-      flex: 1,
-      fontSize: 13,
-      fontWeight: '600',
-      color: c.text,
-    },
-    menuNote: {
-      fontSize: 11,
-      color: c.textSecondary,
-    },
-    badge: {
-      backgroundColor: Brand.danger,
-      borderRadius: 999,
-      paddingHorizontal: 7,
-      paddingVertical: 1,
-    },
-    badgeText: {
-      fontSize: 10,
-      fontWeight: '700',
-      color: '#ffffff',
     },
     note: {
       fontSize: 11,
