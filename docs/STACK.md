@@ -11,8 +11,18 @@ Workerがこの構成を単独で変更してはいけない。
 | クライアント | React Native + Expo (TypeScript) | iOS / Android を単一コードベースで出す。TestFlightとGoogle Playの両方へ配布できる |
 | バックエンド / DB | Supabase (PostgreSQL) | 認証・DB・ストレージが揃い、SQL migrationをリポジトリで管理できる |
 | 言語 | TypeScript (strict) | 型を落とさない。`any`による回避はGateで検出する |
+| ナビゲーション | expo-router | UI prototypeが既にファイルベースルーティングで組まれている。CLAUDE.md 第7章によりprototypeをVisual Source of Truthとするため、これを採用する |
 
 Expo SDK 57 / React 19 / React Native 0.86 / TypeScript 6。
+
+## ルーティングの置き場所
+
+expo-routerのroutesは `src/ui/app/` に置く。
+
+`app.json` の expo-router plugin へ `root: "./src/ui/app"` を渡して既定の `app/` から移している。
+routesは画面そのものでありUIレイヤに属する。リポジトリ直下に `app/` を置くと
+`src/README.md` が定めるレイヤ境界の外にUIが出てしまい、`scripts/check-architecture.sh` の
+「ui の外で react-native を参照している」に該当する。境界を崩さないためにrootを指定する。
 
 ## Gateとの対応
 
@@ -54,10 +64,28 @@ knipのExpoプラグインが `app.json` の `version` から誤検出するも�
 
 以下はまだ決めていない。決めるまで実装しない。
 
-- **ナビゲーション**: expo-router / React Navigation のどちらか。
-  画面が複数になるTaskで、UI prototypeを確認してから決定する。
 - **状態管理**: 追加ライブラリを入れるかどうか。必要になるまで入れない。
 - **配布**: EAS Build の設定と TestFlight / Google Play への接続。
+
+## 追加済みの依存（prototype移植時）
+
+prototypeのソースが実際にimportしているものだけを入れている。
+Expoテンプレート由来で未参照だったもの（`@expo/ui` / `expo-glass-effect` / `expo-device` /
+`expo-font` / `expo-system-ui` / `react-native-gesture-handler` / `playwright` 等）は持ち込まない。
+
+| package | 用途 |
+| --- | --- |
+| expo-router | ファイルベースルーティング |
+| expo-linking / expo-constants / react-native-screens / react-native-safe-area-context | expo-routerの前提 |
+| expo-splash-screen | 起動画面（app.json plugin） |
+| @expo/vector-icons | アイコン |
+| expo-image | 画像表示 |
+| expo-linear-gradient | グラデーション |
+| expo-symbols | SF Symbols |
+| expo-web-browser | 外部リンクの表示 |
+| react-native-svg | ベクタ描画 |
+| react-native-reanimated / react-native-worklets | アニメーション |
+| @react-native-async-storage/async-storage | ログイン状態の永続化（モック段階） |
 
 ## 依存の追加
 
