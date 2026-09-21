@@ -69,8 +69,13 @@ export const opportunitySchema = z.object({
   kind: opportunityKindSchema,
   sport: sportSchema,
   title: z.string().min(1),
-  startsAt: localDateTimeSchema,
-  endsAt: localDateTimeSchema,
+  /**
+   * 開始・終了日時。
+   * 日程が決まっていない常設募集（チームのメンバー募集など）は null になる。
+   * 日付軸の一覧には日時を持つものだけが並ぶ。
+   */
+  startsAt: localDateTimeSchema.nullable(),
+  endsAt: localDateTimeSchema.nullable(),
   location: locationSchema,
   /** 閲覧者から会場までの距離。モック段階の固定値で、位置情報の導入時に算出へ置き換える */
   distanceKm: z.number().min(0),
@@ -109,19 +114,26 @@ export function isOpen(opportunity: Opportunity): boolean {
   return opportunity.status === 'open' && !isFull(opportunity);
 }
 
-/** 開催日（`YYYY-MM-DD`） */
-export function getOpportunityDate(opportunity: Opportunity): string {
-  return opportunity.startsAt.slice(0, 10);
+/** 日程が決まっているか。常設募集は false */
+export function isScheduled(
+  opportunity: Opportunity,
+): opportunity is Opportunity & { startsAt: string; endsAt: string } {
+  return opportunity.startsAt !== null && opportunity.endsAt !== null;
 }
 
-/** 開始時刻（`HH:mm`） */
-export function getStartTime(opportunity: Opportunity): string {
-  return opportunity.startsAt.slice(11, 16);
+/** 開催日（`YYYY-MM-DD`）。常設募集は null */
+export function getOpportunityDate(opportunity: Opportunity): string | null {
+  return opportunity.startsAt?.slice(0, 10) ?? null;
 }
 
-/** 終了時刻（`HH:mm`） */
-export function getEndTime(opportunity: Opportunity): string {
-  return opportunity.endsAt.slice(11, 16);
+/** 開始時刻（`HH:mm`）。常設募集は null */
+export function getStartTime(opportunity: Opportunity): string | null {
+  return opportunity.startsAt?.slice(11, 16) ?? null;
+}
+
+/** 終了時刻（`HH:mm`）。常設募集は null */
+export function getEndTime(opportunity: Opportunity): string | null {
+  return opportunity.endsAt?.slice(11, 16) ?? null;
 }
 
 /** 開始時刻ベースの時間帯 */
@@ -129,8 +141,10 @@ export const timeOfDaySchema = z.enum(['morning', 'day', 'night']);
 
 export type TimeOfDay = z.infer<typeof timeOfDaySchema>;
 
-export function getTimeOfDay(opportunity: Opportunity): TimeOfDay {
-  const hour = Number(getStartTime(opportunity).slice(0, 2));
+export function getTimeOfDay(opportunity: Opportunity): TimeOfDay | null {
+  const startTime = getStartTime(opportunity);
+  if (startTime === null) return null;
+  const hour = Number(startTime.slice(0, 2));
   if (hour < 12) return 'morning';
   if (hour < 17) return 'day';
   return 'night';

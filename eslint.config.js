@@ -50,6 +50,16 @@ module.exports = [
     rules: uiLimits,
   },
   {
+    // モックのシードは分岐を持たない固定データで、1ファイル1責務のまま行数だけが伸びる。
+    // max-lines は責務の肥大化を止めるための上限なので、ここでは外す。
+    // complexity / max-depth などのロジック側の制約は残す。
+    // Supabase導入時にこのディレクトリごと消える（docs/DOMAIN.md 第8章）。
+    files: ['src/data/mock/**/*.ts'],
+    rules: {
+      'max-lines': 'off',
+    },
+  },
+  {
     // テストは長さの制約から外す。
     files: ['**/*.test.{ts,tsx}', '**/__tests__/**/*.{ts,tsx}'],
     rules: {

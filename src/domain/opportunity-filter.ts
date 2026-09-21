@@ -82,7 +82,12 @@ const PREDICATES: ((o: Opportunity, f: OpportunityFilter) => boolean)[] = [
   (o, f) => f.sports.length === 0 || f.sports.includes(o.sport),
   (o, f) => f.kinds.length === 0 || f.kinds.includes(o.kind),
   (o, f) => f.levels.length === 0 || f.levels.includes(o.level),
-  (o, f) => f.times.length === 0 || f.times.includes(getTimeOfDay(o)),
+  (o, f) => {
+    if (f.times.length === 0) return true;
+    const timeOfDay = getTimeOfDay(o);
+    // 時間帯で絞っている間は、日程未定の常設募集は対象外
+    return timeOfDay !== null && f.times.includes(timeOfDay);
+  },
   (o, f) => {
     const max = getMaxFee(f.fee);
     return max === null || o.fee <= max;
