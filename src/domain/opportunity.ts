@@ -57,6 +57,23 @@ export function getOpportunityKindDescription(kind: OpportunityKind): string {
   return OPPORTUNITY_KIND_DESCRIPTIONS[kind];
 }
 
+/**
+ * いま画面で扱う募集の種類。
+ *
+ * モデルとしては7種類を持つが、UI prototypeが画面を持っているのはこの4つだけ。
+ * 残りの selection / tournament / event を画面へ出すかはユーザーが決めること
+ * なので、AIが勝手に増やさない（CLAUDE.md 第7章）。
+ *
+ * 並びはprototypeの RecruitmentTypeLabels と同じ。
+ * 絞りこみ・募集作成・チームの募集設定がこの一覧を共有する。
+ */
+export const SUPPORTED_OPPORTUNITY_KINDS: readonly OpportunityKind[] = [
+  'individual_join',
+  'team_member',
+  'friendly_match',
+  'practice',
+];
+
 export const opportunityStatusSchema = z.enum(['open', 'closed']);
 
 export type OpportunityStatus = z.infer<typeof opportunityStatusSchema>;

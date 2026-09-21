@@ -1,8 +1,8 @@
-import type { OpportunityKind } from '@/domain/opportunity';
+import { WEEKDAYS } from '@/lib/local-date';
+import { SUPPORTED_OPPORTUNITY_KINDS } from '@/domain/opportunity';
 
 export const DAYS_TO_SHOW = 14;
 
-const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'] as const;
 
 /** 開始時間の選択肢(6:00〜22:00) */
 export const START_TIMES = Array.from(
@@ -21,17 +21,8 @@ export const DURATIONS = [
 
 export const FEES = [0, 500, 1000, 1500, 2000, 3000] as const;
 
-/**
- * この画面で作れる募集の種類。
- * domainには7種類あるが、prototypeが募集作成画面に出していたのはこの4つだけ。
- * 画面に足すかどうかはユーザーが決める（CLAUDE.md 第7章）。
- */
-export const POST_KINDS: readonly OpportunityKind[] = [
-  'individual_join',
-  'team_member',
-  'friendly_match',
-  'practice',
-];
+/** この画面で作れる募集の種類 */
+export const POST_KINDS = SUPPORTED_OPPORTUNITY_KINDS;
 
 /** 募集作成フォームで開いているシート */
 export type PostSheetKey = 'date' | 'time' | 'duration' | 'fee';

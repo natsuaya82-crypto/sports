@@ -1,3 +1,4 @@
+import { WEEKDAYS } from '@/lib/local-date';
 import { useRef } from 'react';
 import {
   NativeScrollEvent,
@@ -13,7 +14,6 @@ import {
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 
-const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'] as const;
 /** マスは正方形固定。中身は固定フォントなので絶対にはみ出さない */
 const CELL_SIZE = 50;
 

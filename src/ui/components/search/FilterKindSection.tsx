@@ -3,23 +3,10 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Palette, Spacing, getOpportunityKindColor } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import {
-  OpportunityKind,
-  getOpportunityKindDescription,
-  getOpportunityKindLabel,
-} from '@/domain/opportunity';
+import { OpportunityKind, SUPPORTED_OPPORTUNITY_KINDS, getOpportunityKindDescription, getOpportunityKindLabel } from '@/domain/opportunity';
 
-/**
- * 絞りこみに出す募集タイプ。
- * prototypeに画面があるのはこの4種類だけなので、ここに並べるのもこの4種類にする
- * （残りを出すかはユーザーが決めること。CLAUDE.md 第7章）。
- */
-const SELECTABLE_KINDS: readonly OpportunityKind[] = [
-  'individual_join',
-  'team_member',
-  'friendly_match',
-  'practice',
-];
+/** 絞りこみに出す募集タイプ */
+const SELECTABLE_KINDS = SUPPORTED_OPPORTUNITY_KINDS;
 
 interface Props {
   selected: OpportunityKind[];

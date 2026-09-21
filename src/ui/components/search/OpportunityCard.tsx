@@ -1,3 +1,4 @@
+import { formatMonthDay } from '@/lib/local-date';
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -22,10 +23,6 @@ interface Props {
   onPress?: (item: Opportunity) => void;
 }
 
-function formatDate(date: string): string {
-  const [, m, d] = date.split('-').map(Number);
-  return `${m}月${d}日`;
-}
 
 /** さがす画面の募集カード(グリッドの1枚) */
 export function OpportunityCard({ item, isFavorite, onToggleFavorite, onPress }: Props) {
@@ -56,7 +53,7 @@ export function OpportunityCard({ item, isFavorite, onToggleFavorite, onPress }:
 
         <View style={styles.timeFeeRow}>
           <View style={styles.timeCol}>
-            {date !== null && <Text style={styles.dateText}>{formatDate(date)}</Text>}
+            {date !== null && <Text style={styles.dateText}>{formatMonthDay(date)}</Text>}
             {startTime !== null && endTime !== null && (
               <Text style={styles.timeText}>
                 {startTime}〜{endTime}

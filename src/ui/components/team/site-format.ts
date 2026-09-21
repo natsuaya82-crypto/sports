@@ -1,20 +1,10 @@
 import type { Opportunity } from '@/domain/opportunity';
 import { getOpportunityDate } from '@/domain/opportunity';
 import type { TeamMatch } from '@/domain/team';
-import { getDateFromToday } from '@/lib/local-date';
+import { formatMonthDay, formatSlashDateWithWeekday, getDateFromToday } from '@/lib/local-date';
 
 /** `YYYY-MM-DD` を「M月D日」で */
-export function formatDate(date: string): string {
-  const [, m, d] = date.split('-').map(Number);
-  return `${m}月${d}日`;
-}
 
-/** `YYYY-MM-DD` を「M/D(曜)」で */
-export function formatDateWithWeekday(date: string): string {
-  const [y, m, d] = date.split('-').map(Number);
-  const weekday = ['日', '月', '火', '水', '木', '金', '土'][new Date(y, m - 1, d).getDay()];
-  return `${m}/${d}(${weekday})`;
-}
 
 /** これからの試合(結果がなく日付が今日以降)を近い順で */
 export function upcomingMatches(matches: TeamMatch[] | undefined): TeamMatch[] {
@@ -44,3 +34,9 @@ export function compareByOpportunityDate(a: Opportunity, b: Opportunity): number
   if (dateB === null) return -1;
   return dateA.localeCompare(dateB);
 }
+
+/** `YYYY-MM-DD` を「M月D日」で */
+export const formatDate = formatMonthDay;
+
+/** `YYYY-MM-DD` を「M/D(曜)」で */
+export const formatDateWithWeekday = formatSlashDateWithWeekday;

@@ -1,3 +1,4 @@
+import { formatSlashDateWithWeekday } from '@/lib/local-date';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
@@ -33,11 +34,6 @@ interface ScheduleItem {
   endTime: string;
 }
 
-function formatDate(date: string): string {
-  const [y, m, d] = date.split('-').map(Number);
-  const weekday = ['日', '月', '火', '水', '木', '金', '土'][new Date(y, m - 1, d).getDay()];
-  return `${m}/${d}(${weekday})`;
-}
 
 /** 参加予定(応募が受理された・参加確定したイベント) */
 export default function ScheduleScreen() {
@@ -80,7 +76,7 @@ export default function ScheduleScreen() {
         })
       }>
       <View style={styles.dateCol}>
-        <Text style={styles.dateText}>{formatDate(item.date)}</Text>
+        <Text style={styles.dateText}>{formatSlashDateWithWeekday(item.date)}</Text>
         <Text style={styles.timeText}>{item.startTime}</Text>
       </View>
       <View style={styles.divider} />

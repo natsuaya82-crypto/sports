@@ -1,3 +1,4 @@
+import { formatMonthDayWithWeekday } from '@/lib/local-date';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -12,13 +13,7 @@ import {
 } from '@/domain/opportunity';
 import { getSportLabel } from '@/domain/sport';
 
-const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'] as const;
 
-function formatDateWithWeekday(date: string): string {
-  const [y, m, d] = date.split('-').map(Number);
-  const weekday = WEEKDAYS[new Date(y, m - 1, d).getDay()];
-  return `${m}月${d}日(${weekday})`;
-}
 
 /**
  * 日時の表示文字列。日程未定の常設募集は行ごと出さないため null を返す。
@@ -28,7 +23,7 @@ function formatSchedule(opportunity: Opportunity): string | null {
   if (!isScheduled(opportunity)) return null;
   const date = getOpportunityDate(opportunity);
   if (date === null) return null;
-  return `${formatDateWithWeekday(date)} ${getStartTime(opportunity)}〜${getEndTime(opportunity)}`;
+  return `${formatMonthDayWithWeekday(date)} ${getStartTime(opportunity)}〜${getEndTime(opportunity)}`;
 }
 
 /** 募集詳細の開催情報 */

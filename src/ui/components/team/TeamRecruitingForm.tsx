@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 
 import {
   getOpportunityKindLabel,
-  opportunityKindSchema,
+  SUPPORTED_OPPORTUNITY_KINDS,
   type OpportunityKind,
 } from '@/domain/opportunity';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
@@ -39,7 +39,7 @@ export function TeamRecruitingForm({ team, onSave }: TeamEditFormProps) {
         サイトの募集ページとチーム検索のカードに表示されます
       </Text>
       <View style={styles.chipRow}>
-        {opportunityKindSchema.options.map((t) => (
+        {SUPPORTED_OPPORTUNITY_KINDS.map((t) => (
           <TeamFormChip
             key={t}
             label={getOpportunityKindLabel(t)}
