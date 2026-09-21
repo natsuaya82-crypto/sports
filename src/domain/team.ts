@@ -95,6 +95,25 @@ export const teamSchema = z.object({
 
 export type Team = z.infer<typeof teamSchema>;
 
+/** これからの試合（結果がなく日付が今日以降）を近い順で */
+export function getUpcomingMatches(
+  matches: readonly TeamMatch[] | undefined,
+  today: string,
+): TeamMatch[] {
+  return (matches ?? [])
+    .filter((m) => m.result === undefined && m.date >= today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** 終了した試合（結果あり）を新しい順で */
+export function getFinishedMatches(
+  matches: readonly TeamMatch[] | undefined,
+): TeamMatch[] {
+  return (matches ?? [])
+    .filter((m) => m.result !== undefined)
+    .sort((a, b) => b.date.localeCompare(a.date));
+}
+
 /** いま何か募集しているか */
 export function isRecruiting(team: Team): boolean {
   return team.recruitingKinds.length > 0;

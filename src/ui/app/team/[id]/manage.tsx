@@ -1,3 +1,8 @@
+import { useApplications } from '@/ui/hooks/use-applications';
+import {
+  countPendingApplications,
+  getApplicationsForTeam,
+} from '@/domain/application';
 import { Screen } from '@/ui/components/Screen';
 import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,10 +29,22 @@ export default function TeamManageScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const team = useTeam(id);
   const opportunities = useOpportunities();
+  const applications = useApplications();
 
   const activeCount = useMemo(
     () => (team ? opportunities.filter((o) => o.hostTeamId === team.id).length : 0),
     [team, opportunities],
+  );
+
+  // 未対応の応募件数。prototypeは '新着 2' の固定値だった
+  const pendingCount = useMemo(
+    () =>
+      team === undefined
+        ? 0
+        : countPendingApplications(
+            getApplicationsForTeam(applications, opportunities, team.id),
+          ),
+    [team, applications, opportunities],
   );
 
   if (!team) {
@@ -96,7 +113,7 @@ export default function TeamManageScreen() {
           <TeamManageRow
             icon="mail-open-outline"
             label="応募者の確認"
-            badge="新着 2"
+            badge={pendingCount > 0 ? `新着 ${pendingCount}` : undefined}
             onPress={() => go('/team/[id]/applicants')}
           />
           <TeamManageRow

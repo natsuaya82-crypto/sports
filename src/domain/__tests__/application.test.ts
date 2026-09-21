@@ -1,5 +1,7 @@
 import {
+  countPendingApplications,
   getApplicationsByApplicant,
+  getApplicationsForTeam,
   getApplicationsForOpportunity,
   hasActiveApplication,
   isActive,
@@ -61,5 +63,40 @@ describe('応募の取り出し', () => {
 
   it('募集で絞り、新しい順に並べる', () => {
     expect(getApplicationsForOpportunity(all, 'o1').map((a) => a.id)).toEqual(['a2', 'a1']);
+  });
+});
+
+describe('チームが受け取った応募', () => {
+  const opportunities = [
+    { id: 'o1', hostTeamId: 't1' },
+    { id: 'o2', hostTeamId: 't1' },
+    { id: 'o3', hostTeamId: 't2' },
+    { id: 'o4', hostTeamId: null },
+  ];
+  const applications = [
+    makeApplication({ id: 'a1', opportunityId: 'o1', createdAt: '2026-09-18' }),
+    makeApplication({ id: 'a2', opportunityId: 'o2', createdAt: '2026-09-21', status: 'accepted' }),
+    makeApplication({ id: 'a3', opportunityId: 'o3', createdAt: '2026-09-22' }),
+    makeApplication({ id: 'a4', opportunityId: 'o4', createdAt: '2026-09-23' }),
+  ];
+
+  it('主催している募集への応募だけを新しい順で返す', () => {
+    const result = getApplicationsForTeam(applications, opportunities, 't1');
+    expect(result.map((a) => a.id)).toEqual(['a2', 'a1']);
+  });
+
+  it('個人が主催する募集は含めない', () => {
+    const result = getApplicationsForTeam(applications, opportunities, 't2');
+    expect(result.map((a) => a.id)).toEqual(['a3']);
+  });
+
+  it('未対応の件数を数える', () => {
+    const team1 = getApplicationsForTeam(applications, opportunities, 't1');
+    expect(countPendingApplications(team1)).toBe(1);
+  });
+
+  it('未対応が無ければ0', () => {
+    const accepted = [makeApplication({ status: 'accepted' })];
+    expect(countPendingApplications(accepted)).toBe(0);
   });
 });

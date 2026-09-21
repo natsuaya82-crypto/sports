@@ -62,6 +62,30 @@ export function getApplicationsByApplicant(
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
+/**
+ * 指定したチームが主催する募集へ届いた応募を新しい順で返す。
+ *
+ * 主催しているかは Opportunity.hostTeamId で決まる（docs/DOMAIN.md 第2章）。
+ * 応募者の確認画面と、管理画面の未対応件数が同じ判定を共有する。
+ */
+export function getApplicationsForTeam(
+  applications: readonly Application[],
+  opportunities: readonly { id: string; hostTeamId: string | null }[],
+  teamId: string,
+): Application[] {
+  const hosted = new Set(
+    opportunities.filter((o) => o.hostTeamId === teamId).map((o) => o.id),
+  );
+  return applications
+    .filter((a) => hosted.has(a.opportunityId))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/** まだ対応していない応募の件数 */
+export function countPendingApplications(applications: readonly Application[]): number {
+  return applications.filter((a) => a.status === 'pending').length;
+}
+
 /** 指定したOpportunityへの応募を新しい順で返す */
 export function getApplicationsForOpportunity(
   applications: readonly Application[],

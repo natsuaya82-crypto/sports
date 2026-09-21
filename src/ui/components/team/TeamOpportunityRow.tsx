@@ -1,3 +1,4 @@
+import { formatMonthDay } from '@/lib/local-date';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -13,7 +14,6 @@ import {
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { getOpportunityKindColor, Palette, Spacing } from '@/ui/theme';
 
-import { formatDate } from './site-format';
 
 /** 募集枠1行(タップで募集詳細へ) */
 export function TeamOpportunityRow({ item }: { item: Opportunity }) {
@@ -30,7 +30,7 @@ export function TeamOpportunityRow({ item }: { item: Opportunity }) {
   const fee = item.fee === 0 ? '無料' : `¥${item.fee.toLocaleString()}`;
   const schedule =
     date !== null && startTime !== null && endTime !== null
-      ? `${formatDate(date)} ${startTime}〜${endTime} ・ `
+      ? `${formatMonthDay(date)} ${startTime}〜${endTime} ・ `
       : '';
 
   return (

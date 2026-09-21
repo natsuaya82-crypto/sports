@@ -1,10 +1,10 @@
+import { compareByStartDate } from '@/domain/opportunity';
 import { Screen } from '@/ui/components/Screen';
 import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 
-import { compareByOpportunityDate } from '@/ui/components/team/site-format';
 import { makeSiteStyles } from '@/ui/components/team/site-styles';
 import type { SiteTab } from '@/ui/components/team/site-tab';
 import { TeamSiteFooter } from '@/ui/components/team/TeamSiteFooter';
@@ -36,7 +36,7 @@ export default function TeamSiteScreen() {
     if (!team) return [];
     return allOpportunities
       .filter((o) => o.hostTeamId === team.id)
-      .sort(compareByOpportunityDate);
+      .sort(compareByStartDate);
   }, [team, allOpportunities]);
 
   if (!team) {

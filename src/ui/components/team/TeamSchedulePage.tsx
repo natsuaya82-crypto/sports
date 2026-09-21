@@ -1,10 +1,11 @@
+import { getFinishedMatches, getUpcomingMatches } from '@/domain/team';
+import { formatMonthDay, formatSlashDateWithWeekday, getDateFromToday } from '@/lib/local-date';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { Team, TeamMatch } from '@/domain/team';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { Palette, Spacing } from '@/ui/theme';
 
-import { finishedMatches, formatDate, formatDateWithWeekday, upcomingMatches } from './site-format';
 import { makeSiteStyles } from './site-styles';
 import { TeamPageTitle } from './TeamPageTitle';
 
@@ -12,8 +13,8 @@ import { TeamPageTitle } from './TeamPageTitle';
 export function TeamSchedulePage({ team }: { team: Team }) {
   const styles = useThemedStyles(makeStyles);
   const site = useThemedStyles(makeSiteStyles);
-  const upcoming = upcomingMatches(team.matches);
-  const finished = finishedMatches(team.matches);
+  const upcoming = getUpcomingMatches(team.matches, getDateFromToday(0));
+  const finished = getFinishedMatches(team.matches);
 
   return (
     <View style={site.body}>
@@ -26,7 +27,7 @@ export function TeamSchedulePage({ team }: { team: Team }) {
             <View key={`${m.date}-${m.opponent}`} style={styles.matchRow}>
               <View style={styles.matchDateCol}>
                 <Text style={[styles.matchDate, { color: team.color }]}>
-                  {formatDateWithWeekday(m.date)}
+                  {formatSlashDateWithWeekday(m.date)}
                 </Text>
                 {m.time && <Text style={styles.matchTime}>{m.time}〜</Text>}
               </View>
@@ -72,7 +73,7 @@ function FinishedMatchRow({ match, color }: { match: TeamMatch; color: string })
           {result.our} - {result.their}  vs {match.opponent}
         </Text>
         <Text style={styles.matchMeta}>
-          {[formatDate(match.date), match.competition].filter(Boolean).join(' ・ ')}
+          {[formatMonthDay(match.date), match.competition].filter(Boolean).join(' ・ ')}
         </Text>
       </View>
     </View>

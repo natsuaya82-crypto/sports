@@ -1,3 +1,5 @@
+import { getUpcomingMatches } from '@/domain/team';
+import { formatMonthDay, getDateFromToday } from '@/lib/local-date';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { Opportunity } from '@/domain/opportunity';
@@ -6,7 +8,6 @@ import type { Team } from '@/domain/team';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { Palette, Spacing } from '@/ui/theme';
 
-import { formatDate, upcomingMatches } from './site-format';
 import { makeSiteStyles } from './site-styles';
 import type { SiteTab } from './site-tab';
 import { TeamDigestHeader } from './TeamDigestHeader';
@@ -30,7 +31,7 @@ export function TeamTopPage({
   const styles = useThemedStyles(makeStyles);
   const site = useThemedStyles(makeSiteStyles);
   const openOpportunities = opportunities.filter(isOpen);
-  const upcoming = upcomingMatches(team.matches);
+  const upcoming = getUpcomingMatches(team.matches, getDateFromToday(0));
 
   return (
     <View>
@@ -62,7 +63,7 @@ export function TeamTopPage({
               {team.news.slice(0, 2).map((n) => (
                 <View key={`${n.date}-${n.text}`} style={styles.newsRow}>
                   <Text style={[site.newsDate, { color: team.color }]}>
-                    {formatDate(n.date)}
+                    {formatMonthDay(n.date)}
                   </Text>
                   <Text style={site.newsText} numberOfLines={2}>
                     {n.text}

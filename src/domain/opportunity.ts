@@ -163,3 +163,14 @@ export function getTimeOfDay(opportunity: Opportunity): TimeOfDay | null {
   if (hour < 17) return 'day';
   return 'night';
 }
+
+/**
+ * 開催日の昇順。日程が決まっていない常設募集は日付を持たないため末尾へ置く。
+ */
+export function compareByStartDate(a: Opportunity, b: Opportunity): number {
+  const dateA = getOpportunityDate(a);
+  const dateB = getOpportunityDate(b);
+  if (dateA === null) return dateB === null ? 0 : 1;
+  if (dateB === null) return -1;
+  return dateA.localeCompare(dateB);
+}

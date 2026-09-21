@@ -5,7 +5,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { findUser } from '@/data/user-store';
 import type { Application, ApplicationStatus } from '@/domain/application';
-import { getApplicationsForOpportunity } from '@/domain/application';
+import { getApplicationsForTeam } from '@/domain/application';
 import type { Opportunity } from '@/domain/opportunity';
 import { Screen } from '@/ui/components/Screen';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
@@ -48,16 +48,12 @@ export default function ApplicantsScreen() {
   // このチームが主催する募集に届いた応募を、prototypeと同じく新しい順で並べる
   const applicants = useMemo<TeamApplication[]>(() => {
     if (!id) return [];
-    return opportunities
-      .filter((o) => o.hostTeamId === id)
-      .flatMap((opportunity) =>
-        getApplicationsForOpportunity(applications, opportunity.id).map(
-          (application) => ({ application, opportunity }),
-        ),
-      )
-      .sort((a, b) =>
-        b.application.createdAt.localeCompare(a.application.createdAt),
-      );
+    return getApplicationsForTeam(applications, opportunities, id).flatMap(
+      (application) => {
+        const opportunity = opportunities.find((o) => o.id === application.opportunityId);
+        return opportunity === undefined ? [] : [{ application, opportunity }];
+      },
+    );
   }, [id, opportunities, applications]);
 
   const renderItem = ({ item }: { item: TeamApplication }) => {

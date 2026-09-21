@@ -1,10 +1,10 @@
+import { formatMonthDay } from '@/lib/local-date';
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { Team } from '@/domain/team';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { Palette, Spacing } from '@/ui/theme';
 
-import { formatDate } from './site-format';
 import { makeSiteStyles } from './site-styles';
 import { TeamPageTitle } from './TeamPageTitle';
 
@@ -17,7 +17,7 @@ export function TeamNewsPage({ team }: { team: Team }) {
       <TeamPageTitle en="NEWS" jp="お知らせ" color={team.color} />
       {(team.news ?? []).map((n) => (
         <View key={`${n.date}-${n.text}`} style={styles.newsCard}>
-          <Text style={[site.newsDate, { color: team.color }]}>{formatDate(n.date)}</Text>
+          <Text style={[site.newsDate, { color: team.color }]}>{formatMonthDay(n.date)}</Text>
           <Text style={site.newsText}>{n.text}</Text>
         </View>
       ))}

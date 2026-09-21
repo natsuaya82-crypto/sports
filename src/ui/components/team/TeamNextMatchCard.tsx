@@ -1,10 +1,10 @@
+import { formatSlashDateWithWeekday } from '@/lib/local-date';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { TeamMatch } from '@/domain/team';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { Palette, Spacing } from '@/ui/theme';
 
-import { formatDateWithWeekday } from './site-format';
 
 /** TOPの次戦カード */
 export function TeamNextMatchCard({
@@ -29,7 +29,7 @@ export function TeamNextMatchCard({
       </View>
       <Text style={styles.nextMatchOpponent}>vs {match.opponent}</Text>
       <Text style={styles.nextMatchMeta}>
-        {formatDateWithWeekday(match.date)}
+        {formatSlashDateWithWeekday(match.date)}
         {match.time ? ` ${match.time}〜` : ''}
         {match.venue ? ` @ ${match.venue}` : ''}
       </Text>
