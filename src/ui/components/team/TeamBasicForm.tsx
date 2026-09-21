@@ -6,7 +6,7 @@ import { SPORTS, getSportLabel, type Sport } from '@/domain/sport';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { LevelColors } from '@/ui/theme';
 
-import { makeEditFormStyles, type TeamEditFormProps } from './edit-form';
+import { makeEditFieldStyles, type TeamEditFormProps } from './edit-form';
 import { TeamFormChip } from './TeamFormChip';
 import { TeamFormField } from './TeamFormField';
 import { TeamFormScaffold } from './TeamFormScaffold';
@@ -14,7 +14,7 @@ import { TeamFormScaffold } from './TeamFormScaffold';
 /** 基本情報 */
 export function TeamBasicForm({ team, onSave }: TeamEditFormProps) {
   const { colors } = useAppTheme();
-  const styles = useThemedStyles(makeEditFormStyles);
+  const styles = useThemedStyles(makeEditFieldStyles);
   const [name, setName] = useState(team.name);
   const [tagline, setTagline] = useState(team.tagline);
   const [bio, setBio] = useState(team.bio);

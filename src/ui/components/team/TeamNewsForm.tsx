@@ -7,13 +7,18 @@ import { getDateFromToday } from '@/lib/local-date';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { Brand } from '@/ui/theme';
 
-import { makeEditFormStyles, type TeamEditFormProps } from './edit-form';
+import {
+  makeEditFieldStyles,
+  makeEditFormStyles,
+  type TeamEditFormProps,
+} from './edit-form';
 import { TeamFormScaffold } from './TeamFormScaffold';
 
 /** お知らせ */
 export function TeamNewsForm({ team, onSave }: TeamEditFormProps) {
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeEditFormStyles);
+  const field = useThemedStyles(makeEditFieldStyles);
   const [news, setNews] = useState<TeamNews[]>(team.news ?? []);
   const [draft, setDraft] = useState('');
 
@@ -35,7 +40,7 @@ export function TeamNewsForm({ team, onSave }: TeamEditFormProps) {
           onChangeText={setDraft}
           placeholder="例: リーグ戦 5-1で勝利!"
           placeholderTextColor={colors.textSecondary}
-          style={[styles.input, styles.addInput]}
+          style={[field.input, styles.addInput]}
         />
         <Pressable
           onPress={add}

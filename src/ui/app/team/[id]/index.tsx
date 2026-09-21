@@ -13,16 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { compareByOpportunityDate } from '@/ui/components/team/site-format';
 import { makeSiteStyles } from '@/ui/components/team/site-styles';
 import type { SiteTab } from '@/ui/components/team/site-tab';
-import { TeamAboutPage } from '@/ui/components/team/TeamAboutPage';
-import { TeamGalleryPage } from '@/ui/components/team/TeamGalleryPage';
-import { TeamMembersPage } from '@/ui/components/team/TeamMembersPage';
-import { TeamNewsPage } from '@/ui/components/team/TeamNewsPage';
-import { TeamRecruitPage } from '@/ui/components/team/TeamRecruitPage';
-import { TeamResultsPage } from '@/ui/components/team/TeamResultsPage';
-import { TeamSchedulePage } from '@/ui/components/team/TeamSchedulePage';
 import { TeamSiteFooter } from '@/ui/components/team/TeamSiteFooter';
 import { TeamSiteHeader } from '@/ui/components/team/TeamSiteHeader';
-import { TeamTopPage } from '@/ui/components/team/TeamTopPage';
+import { TeamSitePage } from '@/ui/components/team/TeamSitePage';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { useOpportunities } from '@/ui/hooks/use-opportunities';
 import { useTeam } from '@/ui/hooks/use-teams';
@@ -77,23 +70,13 @@ export default function TeamSiteScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.pageContent}>
         <View style={site.innerWide}>
-          {tab === 'top' && (
-            <TeamTopPage
-              team={team}
-              opportunities={opportunities}
-              onNavigate={setTab}
-              isDesktop={isDesktop}
-            />
-          )}
-          {tab === 'news' && <TeamNewsPage team={team} />}
-          {tab === 'schedule' && <TeamSchedulePage team={team} />}
-          {tab === 'members' && <TeamMembersPage team={team} isDesktop={isDesktop} />}
-          {tab === 'recruit' && (
-            <TeamRecruitPage team={team} opportunities={opportunities} />
-          )}
-          {tab === 'results' && <TeamResultsPage team={team} />}
-          {tab === 'gallery' && <TeamGalleryPage team={team} isDesktop={isDesktop} />}
-          {tab === 'about' && <TeamAboutPage team={team} />}
+          <TeamSitePage
+            team={team}
+            tab={tab}
+            opportunities={opportunities}
+            isDesktop={isDesktop}
+            onNavigate={setTab}
+          />
         </View>
 
         <TeamSiteFooter team={team} />

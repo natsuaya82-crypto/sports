@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { useThemedStyles } from '@/ui/contexts/theme-context';
+import { Palette, Spacing } from '@/ui/theme';
 
 import { makeEditFormStyles, type TeamEditFormProps } from './edit-form';
 import { TeamFormScaffold } from './TeamFormScaffold';
@@ -23,12 +24,13 @@ const COLOR_PRESETS = [
 
 /** チームカラー */
 export function TeamColorForm({ team, onSave }: TeamEditFormProps) {
-  const styles = useThemedStyles(makeEditFormStyles);
+  const styles = useThemedStyles(makeStyles);
+  const form = useThemedStyles(makeEditFormStyles);
   const [color, setColor] = useState(team.color);
 
   return (
     <TeamFormScaffold canSave color={color} onSave={() => onSave({ color })}>
-      <Text style={styles.sectionHint}>
+      <Text style={form.sectionHint}>
         サイトのヘッダー・見出し・ボタンがこの色で統一されます
       </Text>
       <View style={styles.colorRow}>
@@ -53,3 +55,38 @@ export function TeamColorForm({ team, onSave }: TeamEditFormProps) {
     </TeamFormScaffold>
   );
 }
+
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    colorRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: Spacing.two,
+    },
+    colorSwatch: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    colorSwatchSelected: {
+      borderWidth: 3,
+      borderColor: c.backgroundSelected,
+    },
+    colorPreview: {
+      borderRadius: 12,
+      padding: Spacing.three,
+      gap: 2,
+      marginTop: Spacing.two,
+    },
+    colorPreviewName: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: '#ffffff',
+    },
+    colorPreviewText: {
+      fontSize: 11,
+      color: 'rgba(255,255,255,0.85)',
+    },
+  });

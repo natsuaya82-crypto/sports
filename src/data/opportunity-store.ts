@@ -1,4 +1,5 @@
 import type { Opportunity, OpportunityKind } from '@/domain/opportunity';
+import type { Location } from '@/domain/location';
 import type { Team } from '@/domain/team';
 import type { Level } from '@/domain/level';
 import type { Sport } from '@/domain/sport';
@@ -97,8 +98,7 @@ export interface NewOpportunityInput {
   /** `HH:mm` */
   startTime: string;
   endTime: string;
-  venueName: string;
-  ward: string;
+  location: Location;
   fee: number;
   level: Level;
   capacity: number;
@@ -117,7 +117,7 @@ export function createOpportunity(input: NewOpportunityInput): Opportunity {
     title: input.title,
     startsAt: joinDateAndTime(input.date, input.startTime),
     endsAt: joinDateAndTime(input.date, input.endTime),
-    location: findLocationByName(input.venueName, input.ward),
+    location: input.location,
     // 本来は会場と閲覧者の位置から算出する。モックでは近距離固定
     distanceKm: 1.0,
     fee: input.fee,

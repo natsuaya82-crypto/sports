@@ -1,6 +1,6 @@
 import { FlatList, StyleSheet, View } from 'react-native';
 
-import { ListEmptyState } from '@/ui/components/opportunity/ListEmptyState';
+import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { OpportunityCard } from '@/ui/components/search/OpportunityCard';
 import { Palette, Spacing } from '@/ui/theme';
 import { useThemedStyles } from '@/ui/contexts/theme-context';

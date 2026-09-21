@@ -3,7 +3,7 @@ import { Pressable, Text } from 'react-native';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { Brand } from '@/ui/theme';
 
-import { makeEditFormStyles } from './edit-form';
+import { makeEditFieldStyles } from './edit-form';
 
 /** 選択チップ */
 export function TeamFormChip({
@@ -17,7 +17,7 @@ export function TeamFormChip({
   onPress: () => void;
   color?: string;
 }) {
-  const styles = useThemedStyles(makeEditFormStyles);
+  const styles = useThemedStyles(makeEditFieldStyles);
   return (
     <Pressable
       onPress={onPress}

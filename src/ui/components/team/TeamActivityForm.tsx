@@ -3,14 +3,19 @@ import { TextInput, Text, View } from 'react-native';
 
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 
-import { makeEditFormStyles, type TeamEditFormProps } from './edit-form';
+import {
+  makeEditFieldStyles,
+  makeEditFormStyles,
+  type TeamEditFormProps,
+} from './edit-form';
 import { TeamFormField } from './TeamFormField';
 import { TeamFormScaffold } from './TeamFormScaffold';
 
 /** 活動情報 */
 export function TeamActivityForm({ team, onSave }: TeamEditFormProps) {
   const { colors } = useAppTheme();
-  const styles = useThemedStyles(makeEditFormStyles);
+  const styles = useThemedStyles(makeEditFieldStyles);
+  const form = useThemedStyles(makeEditFormStyles);
   const [homeGround, setHomeGround] = useState(team.homeGround ?? '');
   const [schedule, setSchedule] = useState(team.schedule ?? '');
   const [memberCount, setMemberCount] = useState(
@@ -35,7 +40,7 @@ export function TeamActivityForm({ team, onSave }: TeamEditFormProps) {
 
   return (
     <TeamFormScaffold canSave color={team.color} onSave={save}>
-      <Text style={styles.sectionHint}>
+      <Text style={form.sectionHint}>
         空欄の項目はサイトに表示されません(未定ならそのままでOK)
       </Text>
       <TeamFormField label="活動場所">

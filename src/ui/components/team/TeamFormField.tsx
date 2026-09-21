@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 
-import { makeEditFormStyles } from './edit-form';
+import { makeEditFieldStyles } from './edit-form';
 
 /** ラベル付きの入力欄 */
 export function TeamFormField({
@@ -17,7 +17,7 @@ export function TeamFormField({
   style?: object;
   children: ReactNode;
 }) {
-  const styles = useThemedStyles(makeEditFormStyles);
+  const styles = useThemedStyles(makeEditFieldStyles);
   return (
     <View style={[styles.field, style]}>
       <View style={styles.fieldLabelRow}>

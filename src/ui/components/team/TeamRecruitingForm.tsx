@@ -8,13 +8,18 @@ import {
 } from '@/domain/opportunity';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 
-import { makeEditFormStyles, type TeamEditFormProps } from './edit-form';
+import {
+  makeEditFieldStyles,
+  makeEditFormStyles,
+  type TeamEditFormProps,
+} from './edit-form';
 import { TeamFormChip } from './TeamFormChip';
 import { TeamFormScaffold } from './TeamFormScaffold';
 
 /** 募集種別 */
 export function TeamRecruitingForm({ team, onSave }: TeamEditFormProps) {
-  const styles = useThemedStyles(makeEditFormStyles);
+  const styles = useThemedStyles(makeEditFieldStyles);
+  const form = useThemedStyles(makeEditFormStyles);
   const [recruitingKinds, setRecruitingKinds] = useState<OpportunityKind[]>(
     team.recruitingKinds,
   );
@@ -30,7 +35,7 @@ export function TeamRecruitingForm({ team, onSave }: TeamEditFormProps) {
       canSave
       color={team.color}
       onSave={() => onSave({ recruitingKinds })}>
-      <Text style={styles.sectionHint}>
+      <Text style={form.sectionHint}>
         サイトの募集ページとチーム検索のカードに表示されます
       </Text>
       <View style={styles.chipRow}>

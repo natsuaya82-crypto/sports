@@ -5,13 +5,18 @@ import { Pressable, TextInput, Text, View } from 'react-native';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { Brand } from '@/ui/theme';
 
-import { makeEditFormStyles, type TeamEditFormProps } from './edit-form';
+import {
+  makeEditFieldStyles,
+  makeEditFormStyles,
+  type TeamEditFormProps,
+} from './edit-form';
 import { TeamFormScaffold } from './TeamFormScaffold';
 
 /** 実績 */
 export function TeamAchievementsForm({ team, onSave }: TeamEditFormProps) {
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeEditFormStyles);
+  const field = useThemedStyles(makeEditFieldStyles);
   const [achievements, setAchievements] = useState<string[]>(team.achievements ?? []);
   const [draft, setDraft] = useState('');
 
@@ -35,7 +40,7 @@ export function TeamAchievementsForm({ team, onSave }: TeamEditFormProps) {
           onChangeText={setDraft}
           placeholder="例: 区民大会 ベスト4(2025)"
           placeholderTextColor={colors.textSecondary}
-          style={[styles.input, styles.addInput]}
+          style={[field.input, styles.addInput]}
         />
         <Pressable
           onPress={add}

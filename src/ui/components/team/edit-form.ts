@@ -9,7 +9,7 @@ export interface TeamEditFormProps {
   onSave: (patch: Partial<Omit<Team, 'id'>>) => void;
 }
 
-/** 編集フォームで共通して使うスタイル */
+/** フォームの骨格・追加リスト・保存バーのスタイル */
 export const makeEditFormStyles = (c: Palette) =>
   StyleSheet.create({
     content: {
@@ -21,92 +21,6 @@ export const makeEditFormStyles = (c: Palette) =>
       fontSize: 11,
       lineHeight: 17,
       color: c.textSecondary,
-    },
-    field: {
-      gap: 5,
-    },
-    fieldRow: {
-      flexDirection: 'row',
-      gap: Spacing.two,
-    },
-    fieldHalf: {
-      flex: 1,
-    },
-    fieldLabelRow: {
-      flexDirection: 'row',
-      alignItems: 'baseline',
-      gap: Spacing.two,
-    },
-    fieldLabel: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: c.text,
-    },
-    fieldHint: {
-      fontSize: 10,
-      color: c.textSecondary,
-    },
-    input: {
-      backgroundColor: c.backgroundElement,
-      borderRadius: 10,
-      paddingHorizontal: Spacing.two,
-      paddingVertical: 10,
-      fontSize: 13,
-      color: c.text,
-    },
-    inputMultiline: {
-      minHeight: 80,
-      textAlignVertical: 'top',
-    },
-    chipRow: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: Spacing.two,
-    },
-    chip: {
-      borderRadius: 999,
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-      backgroundColor: c.backgroundElement,
-    },
-    chipText: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: c.text,
-    },
-    chipTextSelected: {
-      color: Brand.onPrimary,
-    },
-    colorRow: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: Spacing.two,
-    },
-    colorSwatch: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    colorSwatchSelected: {
-      borderWidth: 3,
-      borderColor: c.backgroundSelected,
-    },
-    colorPreview: {
-      borderRadius: 12,
-      padding: Spacing.three,
-      gap: 2,
-      marginTop: Spacing.two,
-    },
-    colorPreviewName: {
-      fontSize: 15,
-      fontWeight: '800',
-      color: '#ffffff',
-    },
-    colorPreviewText: {
-      fontSize: 11,
-      color: 'rgba(255,255,255,0.85)',
     },
     addRow: {
       flexDirection: 'row',
@@ -174,5 +88,65 @@ export const makeEditFormStyles = (c: Palette) =>
       fontSize: 14,
       fontWeight: '800',
       color: '#ffffff',
+    },
+  });
+
+/** 入力欄・選択チップのスタイル */
+export const makeEditFieldStyles = (c: Palette) =>
+  StyleSheet.create({
+    field: {
+      gap: 5,
+    },
+    fieldRow: {
+      flexDirection: 'row',
+      gap: Spacing.two,
+    },
+    fieldHalf: {
+      flex: 1,
+    },
+    fieldLabelRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      gap: Spacing.two,
+    },
+    fieldLabel: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: c.text,
+    },
+    fieldHint: {
+      fontSize: 10,
+      color: c.textSecondary,
+    },
+    input: {
+      backgroundColor: c.backgroundElement,
+      borderRadius: 10,
+      paddingHorizontal: Spacing.two,
+      paddingVertical: 10,
+      fontSize: 13,
+      color: c.text,
+    },
+    inputMultiline: {
+      minHeight: 80,
+      textAlignVertical: 'top',
+    },
+    chipRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: Spacing.two,
+    },
+    chip: {
+      borderRadius: 999,
+      paddingHorizontal: 14,
+      paddingVertical: 7,
+      backgroundColor: c.backgroundElement,
+    },
+    chipText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: c.text,
+    },
+    chipTextSelected: {
+      color: Brand.onPrimary,
     },
   });

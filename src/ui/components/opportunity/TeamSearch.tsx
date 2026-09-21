@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, TextInput, View } from 'react-native';
 
-import { ListEmptyState } from '@/ui/components/opportunity/ListEmptyState';
+import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { TeamCard } from '@/ui/components/search/TeamCard';
 import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
