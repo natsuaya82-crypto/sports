@@ -1,4 +1,4 @@
-import { WEEKDAYS } from '@/lib/local-date';
+import { getDayOfMonth, getWeekdayIndex , WEEKDAYS } from '@/lib/local-date';
 import { useRef } from 'react';
 import {
   NativeScrollEvent,
@@ -22,11 +22,6 @@ interface Props {
   dates: string[];
   selected: string;
   onSelect: (date: string) => void;
-}
-
-function parseDate(date: string): Date {
-  const [y, m, d] = date.split('-').map(Number);
-  return new Date(y, m - 1, d);
 }
 
 /** 日付ストリップ(横スクロール・正方形マス) */
@@ -76,13 +71,12 @@ export function DateStrip({ dates, selected, onSelect }: Props) {
         scrollEventThrottle={16}
         contentContainerStyle={styles.container}>
       {dates.map((date, index) => {
-        const d = parseDate(date);
-        const weekday = d.getDay();
+        const weekday = getWeekdayIndex(date);
         const isSelected = date === selected;
         const weekdayColor =
           weekday === 0 ? Brand.danger : weekday === 6 ? Brand.info : undefined;
         // 先頭が今日である前提(propsのdatesは今日始まり)
-        const dayLabel = index === 0 ? '今日' : index === 1 ? '明日' : String(d.getDate());
+        const dayLabel = index === 0 ? '今日' : index === 1 ? '明日' : String(getDayOfMonth(date));
         const isWordLabel = index <= 1;
 
         return (

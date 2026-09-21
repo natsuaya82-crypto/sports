@@ -1,5 +1,6 @@
+import { addHoursToTime } from '@/lib/local-date';
 import { Card, SelectorRow } from './PostFormParts';
-import { durationLabel, endTimeOf, type PostSheetKey } from './PostFormOptions';
+import { durationLabel, type PostSheetKey } from './PostFormOptions';
 
 interface Props {
   dateLabel: string;
@@ -25,7 +26,7 @@ export function PostScheduleCard({
       />
       <SelectorRow
         label="どれくらい"
-        value={`${durationLabel(duration)}(〜${endTimeOf(startTime, duration)})`}
+        value={`${durationLabel(duration)}(〜${addHoursToTime(startTime, duration)})`}
         onPress={() => onOpenSheet('duration')}
       />
     </Card>

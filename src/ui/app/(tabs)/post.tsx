@@ -7,12 +7,7 @@ import { ScreenTitle } from '@/ui/components/list/ScreenTitle';
 import { Screen } from '@/ui/components/Screen';
 import { PostConditionCard } from '@/ui/components/opportunity/PostConditionCard';
 import { PostContentCard } from '@/ui/components/opportunity/PostContentCard';
-import {
-  DAYS_TO_SHOW,
-  dateChipLabel,
-  endTimeOf,
-  type PostSheetKey,
-} from '@/ui/components/opportunity/PostFormOptions';
+import { DAYS_TO_SHOW, dateChipLabel, type PostSheetKey } from '@/ui/components/opportunity/PostFormOptions';
 import { PostHostCard } from '@/ui/components/opportunity/PostHostCard';
 import { PostMemberRecruitCard } from '@/ui/components/opportunity/PostMemberRecruitCard';
 import { PostScheduleCard } from '@/ui/components/opportunity/PostScheduleCard';
@@ -28,7 +23,7 @@ import type { Location } from '@/domain/location';
 import type { Level } from '@/domain/level';
 import type { OpportunityKind } from '@/domain/opportunity';
 import type { Sport } from '@/domain/sport';
-import { getDateFromToday } from '@/lib/local-date';
+import { addHoursToTime, getDateFromToday } from '@/lib/local-date';
 
 export default function PostScreen() {
   const router = useRouter();
@@ -85,7 +80,7 @@ export default function PostScreen() {
       title: title.trim(),
       date,
       startTime,
-      endTime: endTimeOf(startTime, duration),
+      endTime: addHoursToTime(startTime, duration),
       location: venue,
       fee,
       level,

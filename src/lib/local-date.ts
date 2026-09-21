@@ -23,10 +23,39 @@ function splitDate(date: string): [number, number, number] {
   return [year, month, day];
 }
 
+/**
+ * `YYYY-MM-DD` の曜日番号（0=日曜）。
+ *
+ * `new Date('2026-09-27')` はUTCの0時として解釈されるため、UTCより西の
+ * タイムゾーンでは前日の曜日になる。日付の各要素からローカルの日付を
+ * 組み立てて、実行環境に依存しないようにする。
+ */
+export function getWeekdayIndex(date: string): number {
+  const [year, month, day] = splitDate(date);
+  return new Date(year, month - 1, day).getDay();
+}
+
 /** `YYYY-MM-DD` の曜日 */
 export function getWeekday(date: string): string {
-  const [year, month, day] = splitDate(date);
-  return WEEKDAYS[new Date(year, month - 1, day).getDay()];
+  return WEEKDAYS[getWeekdayIndex(date)];
+}
+
+/** `YYYY-MM-DD` の日。カレンダーのマスに出す数字 */
+export function getDayOfMonth(date: string): number {
+  return splitDate(date)[2];
+}
+
+/**
+ * 開始時刻に時間数を足した `HH:mm`。
+ * その日のうちに収める（24時をまたがない）。
+ */
+export function addHoursToTime(startTime: string, hours: number): string {
+  const [hour, minute] = startTime.split(':').map(Number);
+  const END_OF_DAY = 23 * 60 + 59;
+  const total = Math.min(hour * 60 + minute + hours * 60, END_OF_DAY);
+  const paddedHour = String(Math.floor(total / 60)).padStart(2, '0');
+  const paddedMinute = String(total % 60).padStart(2, '0');
+  return `${paddedHour}:${paddedMinute}`;
 }
 
 /** `YYYY-MM-DD` を「M月D日」で */

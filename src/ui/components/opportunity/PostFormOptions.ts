@@ -1,4 +1,4 @@
-import { WEEKDAYS } from '@/lib/local-date';
+import { formatSlashDateWithWeekday } from '@/lib/local-date';
 import { SUPPORTED_OPPORTUNITY_KINDS } from '@/domain/opportunity';
 
 export const DAYS_TO_SHOW = 14;
@@ -27,19 +27,10 @@ export const POST_KINDS = SUPPORTED_OPPORTUNITY_KINDS;
 /** 募集作成フォームで開いているシート */
 export type PostSheetKey = 'date' | 'time' | 'duration' | 'fee';
 
-/** 開始時刻 + 時間数 → 終了時刻(HH:mm) */
-export function endTimeOf(startTime: string, hours: number): string {
-  const [h, m] = startTime.split(':').map(Number);
-  const total = Math.min(h * 60 + m + hours * 60, 23 * 60 + 59);
-  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
-}
-
 export function dateChipLabel(date: string, index: number): string {
   if (index === 0) return '今日';
   if (index === 1) return '明日';
-  const [, m, d] = date.split('-').map(Number);
-  const weekday = WEEKDAYS[new Date(date).getDay()];
-  return `${m}/${d}(${weekday})`;
+  return formatSlashDateWithWeekday(date);
 }
 
 export function durationLabel(hours: number): string | undefined {
