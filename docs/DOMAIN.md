@@ -197,9 +197,57 @@ Opportunity        OpportunityList ではない
 
 何をするかを名前にする（`OpportunityValidator` ではなく `validateOpportunity`）。
 
-## 8. 決めていないこと
+## 8. prototype移植時の決定
 
-- ナビゲーション（expo-router / React Navigation）
+UI prototypeを `src/` のレイヤ構造へ移すにあたりLeaderが決定した事項。
+
+### Recruitment を Opportunity へ統合
+
+prototypeの `Recruitment` と、第2章の `Opportunity` は同じ概念だった。
+同じ概念に別modelを置かないため（CLAUDE.md 第17章）`Opportunity` へ一本化し、
+`RecruitmentType` を `kind` へ対応させた。
+
+| prototype | kind | 表示名 |
+| --- | --- | --- |
+| `helper` | `individual_join` | 助っ人募集 |
+| `member` | `team_member` | メンバー募集 |
+| `trial` | `practice` | 体験参加OK |
+| `match` | `friendly_match` | 対戦相手募集 |
+
+`selection` / `tournament` / `event` は第2章で決めた種類として型には持つが、
+prototypeに画面が無いためUIの選択肢には出さない。
+detailテーブルは第2章のとおり、固有の構造化属性が必要になるまで作らない。
+
+### Person と UserAccount を User へ統合
+
+prototypeには「自分のアカウント」と「スカウト対象の個人」で別の型があったが、
+どちらも同じ概念の公開プロフィールである。`User` へ統合し、個人LPの項目
+（ポジション・プレースタイル・経歴・活動可能曜日・希望する参加形態）を
+任意フィールドとして持たせた。
+
+### TeamMember という名前を分けた
+
+第1章の `TeamMember` は権限判定に使う所属レコード。
+prototypeが持っていたのは公開ページに載せる名簿で、ログインアカウントと
+結びついていない。別物なので後者を `TeamRosterEntry` とした。
+
+権限判定はモック段階では `User.managedTeamIds` で行う。
+Supabase導入時に第5章のとおりRLSへ移し、そこで所属レコードとしての
+`TeamMember` を作る。**認可をクライアントに残さない。**
+
+### モック段階で許している非正規化
+
+バックエンドが無いため集計・結合の代わりに値を持たせている箇所がある。
+Supabase導入時に置き換える。
+
+| フィールド | 本来 | 置き換え先 |
+| --- | --- | --- |
+| `Opportunity.filledCount` | accepted な Application の件数（第4章） | 集計 |
+| `Opportunity.hostTeamName` | `host_team_id` からの結合 | join |
+| `Opportunity.distanceKm` | 会場と閲覧者の位置から算出 | 位置情報の導入時 |
+
+## 9. 決めていないこと
+
 - 状態管理ライブラリを追加するかどうか
 - 通知（Notification）の配信手段
 
