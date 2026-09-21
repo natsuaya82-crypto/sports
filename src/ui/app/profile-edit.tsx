@@ -14,8 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
 import { useCurrentUser, useAuth } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import { Level, getLevelLabel } from '@/domain/level';
-import { Sport, getSportLabel } from '@/domain/sport';
+import { LEVELS, Level, getLevelLabel } from '@/domain/level';
+import { SPORTS, Sport, getSportLabel } from '@/domain/sport';
 
 /** 個人プロフィールの編集 */
 export default function ProfileEditScreen() {
@@ -84,7 +84,7 @@ export default function ProfileEditScreen() {
 
         <Field label="やっている種目">
           <View style={styles.chipRow}>
-            {(Object.keys(getSportLabel) as Sport[]).map((s) => (
+            {SPORTS.map((s) => (
               <Chip
                 key={s}
                 label={getSportLabel(s)}
@@ -97,7 +97,7 @@ export default function ProfileEditScreen() {
 
         <Field label="レベル感">
           <View style={styles.chipRow}>
-            {(Object.keys(getLevelLabel) as Level[]).map((l) => (
+            {LEVELS.map((l) => (
               <Chip
                 key={l}
                 label={getLevelLabel(l)}
