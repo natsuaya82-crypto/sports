@@ -76,11 +76,3 @@ export function createApplication(input: NewApplicationInput): Application {
   store.update((current) => [created, ...current]);
   return created;
 }
-
-/** 応募の状態を変える（受理・不成立・取り下げ） */
-export function updateApplicationStatus(
-  id: string,
-  status: Application['status'],
-): void {
-  store.update((current) => current.map((a) => (a.id === id ? { ...a, status } : a)));
-}

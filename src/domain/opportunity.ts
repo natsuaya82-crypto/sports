@@ -74,9 +74,8 @@ export const SUPPORTED_OPPORTUNITY_KINDS: readonly OpportunityKind[] = [
   'practice',
 ];
 
-export const opportunityStatusSchema = z.enum(['open', 'closed']);
+const opportunityStatusSchema = z.enum(['open', 'closed']);
 
-export type OpportunityStatus = z.infer<typeof opportunityStatusSchema>;
 
 /** ローカル日時。`YYYY-MM-DDTHH:mm` */
 const localDateTimeSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/);
@@ -154,9 +153,7 @@ export function getEndTime(opportunity: Opportunity): string | null {
 }
 
 /** 開始時刻ベースの時間帯 */
-export const timeOfDaySchema = z.enum(['morning', 'day', 'night']);
-
-export type TimeOfDay = z.infer<typeof timeOfDaySchema>;
+export type TimeOfDay = 'morning' | 'day' | 'night';
 
 export function getTimeOfDay(opportunity: Opportunity): TimeOfDay | null {
   const startTime = getStartTime(opportunity);

@@ -44,14 +44,6 @@ export const userSchema = z.object({
 
 export type User = z.infer<typeof userSchema>;
 
-/** マイページで「誰として使うか」 */
-export const actingAsSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('personal') }),
-  z.object({ kind: z.literal('team'), teamId: z.string() }),
-]);
-
-export type ActingAs = z.infer<typeof actingAsSchema>;
-
 /** メイン競技。種目を1つも登録していなければ undefined */
 export function getMainSport(user: User): User['sports'][number] | undefined {
   return user.sports[0];

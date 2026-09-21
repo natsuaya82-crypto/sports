@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /** 応募の状態（docs/DOMAIN.md 第3章） */
-export const applicationStatusSchema = z.enum([
+const applicationStatusSchema = z.enum([
   'pending',
   'accepted',
   'rejected',

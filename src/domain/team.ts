@@ -6,7 +6,7 @@ import { prefectureSchema } from './prefecture';
 import { sportSchema } from './sport';
 
 /** チームのお知らせ（公式サイトのNEWS欄） */
-export const teamNewsSchema = z.object({
+const teamNewsSchema = z.object({
   /** `YYYY-MM-DD` */
   date: z.string(),
   text: z.string(),
@@ -15,7 +15,7 @@ export const teamNewsSchema = z.object({
 export type TeamNews = z.infer<typeof teamNewsSchema>;
 
 /** 試合（公式サイトの日程・結果欄） */
-export const teamMatchSchema = z.object({
+const teamMatchSchema = z.object({
   /** `YYYY-MM-DD` */
   date: z.string(),
   /** `HH:mm` */
@@ -37,7 +37,7 @@ export type TeamMatch = z.infer<typeof teamMatchSchema>;
  * こちらは公開ページに載せる名簿であり、ログインアカウントと結びついていない。
  * 権限はモック段階では User.managedTeamIds で判定する。
  */
-export const teamRosterEntrySchema = z.object({
+const teamRosterEntrySchema = z.object({
   name: z.string(),
   /** 背番号 */
   number: z.number().int().optional(),

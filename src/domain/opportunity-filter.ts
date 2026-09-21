@@ -1,14 +1,12 @@
-import { z } from 'zod';
-
-import { levelSchema } from './level';
+import type { Level } from './level';
 import {
   getTimeOfDay,
   isOpen,
-  opportunityKindSchema,
-  timeOfDaySchema,
   type Opportunity,
+  type OpportunityKind,
+  type TimeOfDay,
 } from './opportunity';
-import { sportSchema } from './sport';
+import type { Sport } from './sport';
 
 /** 費用の上限（円）。null は指定なし、0 は無料のみ */
 export const FEE_OPTIONS = [
@@ -18,7 +16,7 @@ export const FEE_OPTIONS = [
   { key: 'u2000', label: '〜¥2,000', max: 2000 },
 ] as const;
 
-export type FeeKey = (typeof FEE_OPTIONS)[number]['key'];
+type FeeKey = (typeof FEE_OPTIONS)[number]['key'];
 
 /** 距離の上限（km）。null は指定なし */
 export const DISTANCE_OPTIONS = [
@@ -28,7 +26,7 @@ export const DISTANCE_OPTIONS = [
   { key: 'd10', label: '10km', max: 10 },
 ] as const;
 
-export type DistanceKey = (typeof DISTANCE_OPTIONS)[number]['key'];
+type DistanceKey = (typeof DISTANCE_OPTIONS)[number]['key'];
 
 /**
  * 時間帯の選択肢。
@@ -40,21 +38,18 @@ export const TIME_OPTIONS = [
   { key: 'night', label: '夜' },
 ] as const;
 
-export const opportunityFilterSchema = z.object({
+/** 絞りこみの選択状態。画面内の状態であり外部入力ではないのでschemaは持たない */
+export interface OpportunityFilter {
   /** 空配列 = すべて */
-  sports: z.array(sportSchema),
-  kinds: z.array(opportunityKindSchema),
-  levels: z.array(levelSchema),
-  times: z.array(timeOfDaySchema),
-  fee: z.enum(FEE_OPTIONS.map((o) => o.key) as unknown as [FeeKey, ...FeeKey[]]),
-  distance: z.enum(
-    DISTANCE_OPTIONS.map((o) => o.key) as unknown as [DistanceKey, ...DistanceKey[]],
-  ),
+  sports: Sport[];
+  kinds: OpportunityKind[];
+  levels: Level[];
+  times: TimeOfDay[];
+  fee: FeeKey;
+  distance: DistanceKey;
   /** 締切・満員を除いて空きがある募集だけにする */
-  openOnly: z.boolean(),
-});
-
-export type OpportunityFilter = z.infer<typeof opportunityFilterSchema>;
+  openOnly: boolean;
+}
 
 export const DEFAULT_FILTER: OpportunityFilter = {
   sports: [],

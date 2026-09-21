@@ -1,14 +1,10 @@
-import { z } from 'zod';
+import { getShortPrefectureName, type Prefecture } from './prefecture';
 
-import { getShortPrefectureName, prefectureSchema, type Prefecture } from './prefecture';
-
-/** エリア絞りこみの選択状態 */
-export const areaSelectionSchema = z.object({
+/** エリア絞りこみの選択状態。画面内の状態であり外部入力ではないのでschemaは持たない */
+export interface AreaSelection {
   /** 空配列 = すべての都道府県 */
-  prefectures: z.array(prefectureSchema),
-});
-
-export type AreaSelection = z.infer<typeof areaSelectionSchema>;
+  prefectures: Prefecture[];
+}
 
 export const DEFAULT_AREA: AreaSelection = { prefectures: ['東京都'] };
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["App.tsx"],
-  "project": ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
+  "entry": ["src/ui/app/**/*.{ts,tsx}", "src/**/__tests__/**/*.{ts,tsx}"],
+  "project": ["src/**/*.{ts,tsx}"],
   "ignoreDependencies": ["expo-updates"]
 }
