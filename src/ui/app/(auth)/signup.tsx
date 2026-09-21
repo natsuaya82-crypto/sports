@@ -1,21 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Brand, Palette, Spacing } from '@/ui/theme';
+import { AuthField } from '@/ui/components/auth/AuthField';
+import { AuthFooterLink } from '@/ui/components/auth/AuthFooterLink';
+import { AuthFormLayout } from '@/ui/components/auth/AuthFormLayout';
+import { AuthSubmit } from '@/ui/components/auth/AuthSubmit';
+import { ScreenHeader } from '@/ui/components/row/ScreenHeader';
 import { AccountKind, useAuth } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { Brand, Palette, Spacing } from '@/ui/theme';
 
 const KIND_OPTIONS: {
   key: AccountKind;
@@ -63,147 +58,69 @@ export default function SignupScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      {/* ヘッダー */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>新規登録</Text>
-        <View style={styles.headerSide} />
-      </View>
-
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          {/* 個人 / 団体 */}
-          <Text style={styles.sectionTitle}>どう使う?</Text>
-          <View style={styles.kindRow}>
-            {KIND_OPTIONS.map((o) => {
-              const selected = kind === o.key;
-              return (
-                <Pressable
-                  key={o.key}
-                  onPress={() => setKind(o.key)}
-                  style={[styles.kindCard, selected && styles.kindCardSelected]}>
-                  <Ionicons
-                    name={o.icon}
-                    size={22}
-                    color={selected ? Brand.primary : colors.textSecondary}
-                  />
-                  <Text style={[styles.kindLabel, selected && styles.kindLabelSelected]}>
-                    {o.label}
-                  </Text>
-                  <Text style={styles.kindDesc}>{o.desc}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-          <Text style={styles.hint}>
-            あとから切り替えできます。チームは登録後いつでも作れます
-          </Text>
-
-          <Field label={kind === 'team' ? 'あなたの名前(代表者)' : 'ニックネーム'}>
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              placeholder="例: たなか なつ"
-              placeholderTextColor={colors.textSecondary}
-              style={styles.input}
-            />
-          </Field>
-          <Field label="メールアドレス">
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              placeholder="you@example.com"
-              placeholderTextColor={colors.textSecondary}
-              style={styles.input}
-            />
-          </Field>
-          <Field label="パスワード(4文字以上)">
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              placeholder="パスワード"
-              placeholderTextColor={colors.textSecondary}
-              style={styles.input}
-            />
-          </Field>
-
-          {error && <Text style={styles.error}>{error}</Text>}
-
-          <Pressable
-            onPress={submit}
-            disabled={busy || !canSubmit}
-            style={({ pressed }) => [
-              styles.primaryButton,
-              (busy || !canSubmit) && styles.disabled,
-              pressed && styles.pressed,
-            ]}>
-            <Text style={styles.primaryText}>登録して始める</Text>
-          </Pressable>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>すでに登録済み?</Text>
-            <Pressable onPress={() => router.back()}>
-              <Text style={styles.footerLink}>ログイン</Text>
+    <AuthFormLayout header={<ScreenHeader title="新規登録" onBack={() => router.back()} />}>
+      {/* 個人 / 団体 */}
+      <Text style={styles.sectionTitle}>どう使う?</Text>
+      <View style={styles.kindRow}>
+        {KIND_OPTIONS.map((o) => {
+          const selected = kind === o.key;
+          return (
+            <Pressable
+              key={o.key}
+              onPress={() => setKind(o.key)}
+              style={[styles.kindCard, selected && styles.kindCardSelected]}>
+              <Ionicons
+                name={o.icon}
+                size={22}
+                color={selected ? Brand.primary : colors.textSecondary}
+              />
+              <Text style={[styles.kindLabel, selected && styles.kindLabelSelected]}>
+                {o.label}
+              </Text>
+              <Text style={styles.kindDesc}>{o.desc}</Text>
             </Pressable>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
-}
+          );
+        })}
+      </View>
+      <Text style={styles.hint}>
+        あとから切り替えできます。チームは登録後いつでも作れます
+      </Text>
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  const styles = useThemedStyles(makeStyles);
-  return (
-    <View style={styles.field}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      {children}
-    </View>
+      <AuthField
+        label={kind === 'team' ? 'あなたの名前(代表者)' : 'ニックネーム'}
+        value={name}
+        onChangeText={setName}
+        placeholder="例: たなか なつ"
+      />
+      <AuthField
+        label="メールアドレス"
+        value={email}
+        onChangeText={setEmail}
+        placeholder="you@example.com"
+        kind="email"
+      />
+      <AuthField
+        label="パスワード(4文字以上)"
+        value={password}
+        onChangeText={setPassword}
+        placeholder="パスワード"
+        kind="password"
+      />
+
+      <AuthSubmit
+        label="登録して始める"
+        error={error}
+        disabled={busy || !canSubmit}
+        onPress={submit}
+      />
+
+      <AuthFooterLink text="すでに登録済み?" link="ログイン" onPress={() => router.back()} />
+    </AuthFormLayout>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    flex: {
-      flex: 1,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: {
-      width: 32,
-      alignItems: 'flex-start',
-    },
-    headerTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: c.text,
-    },
-    content: {
-      padding: Spacing.four,
-      gap: Spacing.two,
-    },
     sectionTitle: {
       fontSize: 13,
       fontWeight: '700',
@@ -242,60 +159,5 @@ const makeStyles = (c: Palette) =>
       fontSize: 11,
       color: c.textSecondary,
       marginBottom: Spacing.two,
-    },
-    field: {
-      gap: 5,
-    },
-    fieldLabel: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: c.text,
-    },
-    input: {
-      backgroundColor: c.backgroundElement,
-      borderRadius: 10,
-      paddingHorizontal: Spacing.three,
-      paddingVertical: 13,
-      fontSize: 14,
-      color: c.text,
-    },
-    error: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: Brand.danger,
-    },
-    primaryButton: {
-      alignItems: 'center',
-      backgroundColor: Brand.primary,
-      borderRadius: 999,
-      paddingVertical: 14,
-      marginTop: Spacing.two,
-    },
-    disabled: {
-      opacity: 0.4,
-    },
-    pressed: {
-      opacity: 0.85,
-    },
-    primaryText: {
-      fontSize: 15,
-      fontWeight: '800',
-      color: Brand.onPrimary,
-    },
-    footer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 6,
-      marginTop: Spacing.three,
-    },
-    footerText: {
-      fontSize: 13,
-      color: c.textSecondary,
-    },
-    footerLink: {
-      fontSize: 13,
-      fontWeight: '800',
-      color: Brand.primary,
     },
   });

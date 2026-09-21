@@ -3,6 +3,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import type { TeamRosterEntry } from '@/domain/team';
@@ -18,11 +20,11 @@ export default function MembersScreen() {
   const members = team?.roster ?? [];
 
   const renderItem = ({ item }: { item: TeamRosterEntry }) => (
-    <View style={styles.row}>
+    <ListRow>
       <View style={[styles.number, { backgroundColor: team?.color ?? Brand.primary }]}>
         <Text style={styles.numberText}>{item.number != null ? item.number : '-'}</Text>
       </View>
-      <View style={styles.rowBody}>
+      <ListRowBody gap={2}>
         <View style={styles.nameRow}>
           <Text style={styles.name} numberOfLines={1}>
             {item.name}
@@ -34,22 +36,16 @@ export default function MembersScreen() {
           )}
         </View>
         {item.position && <Text style={styles.position}>{item.position}</Text>}
-      </View>
+      </ListRowBody>
       <Pressable hitSlop={8}>
         <Ionicons name="ellipsis-horizontal" size={18} color={colors.textSecondary} />
       </Pressable>
-    </View>
+    </ListRow>
   );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>メンバー管理</Text>
-        <View style={styles.headerSide} />
-      </View>
+      <ScreenHeader title="メンバー管理" />
 
       <FlatList
         data={members}
@@ -79,28 +75,8 @@ export default function MembersScreen() {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: c.background },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: { width: 32, alignItems: 'flex-start' },
-    headerTitle: { fontSize: 15, fontWeight: '700', color: c.text },
     listContent: { padding: Spacing.three, gap: Spacing.two },
     count: { fontSize: 12, color: c.textSecondary, marginBottom: Spacing.one },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
-    },
     number: {
       width: 38,
       height: 38,
@@ -109,7 +85,6 @@ const makeStyles = (c: Palette) =>
       justifyContent: 'center',
     },
     numberText: { fontSize: 15, fontWeight: '900', color: '#ffffff' },
-    rowBody: { flex: 1, gap: 2 },
     nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     name: { fontSize: 14, fontWeight: '700', color: c.text },
     roleBadge: {

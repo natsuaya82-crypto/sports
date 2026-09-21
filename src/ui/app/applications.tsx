@@ -1,9 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ListEmptyState } from '@/ui/components/ListEmptyState';
+import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
@@ -13,8 +16,6 @@ import { getApplicationsByApplicant, type Application } from '@/domain/applicati
 
 /** 応募履歴(マイページから) */
 export default function ApplicationsScreen() {
-  const router = useRouter();
-  const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   const currentUser = useCurrentUser();
   const applications = useApplications();
@@ -26,13 +27,7 @@ export default function ApplicationsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>応募履歴</Text>
-        <View style={styles.headerSide} />
-      </View>
+      <ScreenHeader title="応募履歴" />
       <FlatList
         data={myApplications}
         keyExtractor={(item) => item.id}
@@ -40,10 +35,10 @@ export default function ApplicationsScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>まだ応募がありません</Text>
-            <Text style={styles.emptyHint}>気になる募集に応募すると、ここに並びます</Text>
-          </View>
+          <ListEmptyState
+            title="まだ応募がありません"
+            hint="気になる募集に応募すると、ここに並びます"
+          />
         }
       />
     </SafeAreaView>
@@ -63,8 +58,7 @@ function ApplicationRow({ application }: { application: Application }) {
   if (opportunity === undefined) return null;
 
   return (
-    <Pressable
-      style={styles.row}
+    <ListRow
       onPress={() =>
         router.push({
           pathname: '/opportunity/[id]',
@@ -74,14 +68,14 @@ function ApplicationRow({ application }: { application: Application }) {
       <View style={styles.statusBadge}>
         <Text style={styles.statusText}>応募済み</Text>
       </View>
-      <View style={styles.rowBody}>
+      <ListRowBody gap={2}>
         <Text style={styles.rowTitle} numberOfLines={1}>
           {opportunity.title}
         </Text>
         <Text style={styles.rowTeam}>{opportunity.hostTeamName}</Text>
-      </View>
+      </ListRowBody>
       <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-    </Pressable>
+    </ListRow>
   );
 }
 
@@ -91,36 +85,9 @@ const makeStyles = (c: Palette) =>
       flex: 1,
       backgroundColor: c.background,
     },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: {
-      width: 32,
-      alignItems: 'flex-start',
-    },
-    headerTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: c.text,
-    },
     listContent: {
       padding: Spacing.three,
       gap: Spacing.two,
-    },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
     },
     statusBadge: {
       backgroundColor: c.primarySoft,
@@ -133,10 +100,6 @@ const makeStyles = (c: Palette) =>
       fontWeight: '700',
       color: Brand.primary,
     },
-    rowBody: {
-      flex: 1,
-      gap: 2,
-    },
     rowTitle: {
       fontSize: 12,
       fontWeight: '700',
@@ -145,21 +108,5 @@ const makeStyles = (c: Palette) =>
     rowTeam: {
       fontSize: 11,
       color: c.textSecondary,
-    },
-    empty: {
-      alignItems: 'center',
-      paddingTop: 80,
-      gap: Spacing.two,
-      paddingHorizontal: Spacing.four,
-    },
-    emptyTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: c.text,
-    },
-    emptyHint: {
-      fontSize: 12,
-      color: c.textSecondary,
-      textAlign: 'center',
     },
   });

@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ShieldIcon } from '@/ui/components/Icons';
+import { ListEmptyState } from '@/ui/components/ListEmptyState';
+import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
 import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { useApplications, useMessageThreads } from '@/ui/hooks/use-applications';
@@ -25,10 +27,10 @@ export default function MessagesScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>まだやりとりがありません</Text>
-            <Text style={styles.emptyHint}>募集に応募すると、ここでやりとりできます</Text>
-          </View>
+          <ListEmptyState
+            title="まだやりとりがありません"
+            hint="募集に応募すると、ここでやりとりできます"
+          />
         }
       />
     </SafeAreaView>
@@ -49,24 +51,23 @@ function ThreadRow({ thread }: { thread: MessageThread }) {
 
   const last = getLastMessage(thread);
   return (
-    <Pressable
-      style={styles.row}
+    <ListRow
       onPress={() =>
         router.push({ pathname: '/chat/[id]', params: { id: thread.applicationId } })
       }>
       <View style={styles.avatar}>
         <ShieldIcon size={18} color={colors.textSecondary} />
       </View>
-      <View style={styles.rowBody}>
+      <ListRowBody gap={2}>
         <Text style={styles.rowName} numberOfLines={1}>
           {opportunity.hostTeamName}
         </Text>
         <Text style={styles.rowPreview} numberOfLines={1}>
           {last ? `${last.author === 'applicant' ? 'あなた: ' : ''}${last.text}` : ''}
         </Text>
-      </View>
+      </ListRowBody>
       <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-    </Pressable>
+    </ListRow>
   );
 }
 
@@ -89,15 +90,6 @@ const makeStyles = (c: Palette) =>
       gap: Spacing.two,
       paddingBottom: 88,
     },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
-    },
     avatar: {
       width: 44,
       height: 44,
@@ -105,10 +97,6 @@ const makeStyles = (c: Palette) =>
       alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: c.backgroundElement,
-    },
-    rowBody: {
-      flex: 1,
-      gap: 2,
     },
     rowName: {
       fontSize: 13,
@@ -118,21 +106,5 @@ const makeStyles = (c: Palette) =>
     rowPreview: {
       fontSize: 11,
       color: c.textSecondary,
-    },
-    empty: {
-      alignItems: 'center',
-      paddingTop: 80,
-      gap: Spacing.two,
-      paddingHorizontal: Spacing.four,
-    },
-    emptyTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: c.text,
-    },
-    emptyHint: {
-      fontSize: 12,
-      color: c.textSecondary,
-      textAlign: 'center',
     },
   });

@@ -2,13 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { findUser } from '@/data/user-store';
 import type { Application, ApplicationStatus } from '@/domain/application';
 import { getApplicationsForOpportunity } from '@/domain/application';
 import type { Opportunity } from '@/domain/opportunity';
+import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { useApplications } from '@/ui/hooks/use-applications';
 import { useOpportunities } from '@/ui/hooks/use-opportunities';
@@ -64,8 +66,7 @@ export default function ApplicantsScreen() {
     const applicant = findUser(application.applicantUserId);
     const isPending = application.status === 'pending';
     return (
-      <Pressable
-        style={styles.card}
+      <ListRow
         onPress={() =>
           applicant &&
           router.push({ pathname: '/user/[id]', params: { id: applicant.id } })
@@ -75,7 +76,7 @@ export default function ApplicantsScreen() {
           style={styles.avatar}
           contentFit="cover"
         />
-        <View style={styles.cardBody}>
+        <ListRowBody gap={3}>
           <View style={styles.nameRow}>
             <Text style={styles.name} numberOfLines={1}>
               {applicant?.displayName ?? '応募者'}
@@ -92,21 +93,15 @@ export default function ApplicantsScreen() {
           <Text style={styles.message} numberOfLines={2}>
             {application.message}
           </Text>
-        </View>
+        </ListRowBody>
         <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-      </Pressable>
+      </ListRow>
     );
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>応募者の確認</Text>
-        <View style={styles.headerSide} />
-      </View>
+      <ScreenHeader title="応募者の確認" />
 
       {team && (
         <Text style={styles.subheader}>
@@ -134,17 +129,6 @@ export default function ApplicantsScreen() {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: c.background },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: { width: 32, alignItems: 'flex-start' },
-    headerTitle: { fontSize: 15, fontWeight: '700', color: c.text },
     subheader: {
       fontSize: 12,
       color: c.textSecondary,
@@ -152,22 +136,12 @@ const makeStyles = (c: Palette) =>
       paddingTop: Spacing.two,
     },
     listContent: { padding: Spacing.three, gap: Spacing.two },
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
-    },
     avatar: {
       width: 48,
       height: 48,
       borderRadius: 24,
       backgroundColor: c.backgroundElement,
     },
-    cardBody: { flex: 1, gap: 3 },
     nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
     name: { flex: 1, fontSize: 14, fontWeight: '700', color: c.text },
     statusBadge: {

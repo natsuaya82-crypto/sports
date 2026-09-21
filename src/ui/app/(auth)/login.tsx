@@ -1,25 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Brand, Palette, Spacing } from '@/ui/theme';
-import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { AuthField } from '@/ui/components/auth/AuthField';
+import { AuthFooterLink } from '@/ui/components/auth/AuthFooterLink';
+import { AuthFormLayout } from '@/ui/components/auth/AuthFormLayout';
+import { AuthSubmit } from '@/ui/components/auth/AuthSubmit';
 import { useAuth } from '@/ui/contexts/auth-context';
+import { useThemedStyles } from '@/ui/contexts/theme-context';
+import { Brand, Palette, Spacing } from '@/ui/theme';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   const { login, demoEmail, demoPassword } = useAuth();
 
@@ -44,101 +37,55 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          {/* ロゴ */}
-          <View style={styles.brandMark}>
-            <Ionicons name="football" size={30} color={Brand.onPrimary} />
-          </View>
-          <Text style={styles.brandName}>スポマチ</Text>
-          <Text style={styles.brandTagline}>チームと選手が、見つけ合う。</Text>
+    <AuthFormLayout centered>
+      {/* ロゴ */}
+      <View style={styles.brandMark}>
+        <Ionicons name="football" size={30} color={Brand.onPrimary} />
+      </View>
+      <Text style={styles.brandName}>スポマチ</Text>
+      <Text style={styles.brandTagline}>チームと選手が、見つけ合う。</Text>
 
-          <View style={styles.form}>
-            <Field label="メールアドレス">
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                placeholder="you@example.com"
-                placeholderTextColor={colors.textSecondary}
-                style={styles.input}
-              />
-            </Field>
-            <Field label="パスワード">
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                placeholder="パスワード"
-                placeholderTextColor={colors.textSecondary}
-                style={styles.input}
-                onSubmitEditing={() => submit()}
-              />
-            </Field>
+      <View style={styles.form}>
+        <AuthField
+          label="メールアドレス"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="you@example.com"
+          kind="email"
+        />
+        <AuthField
+          label="パスワード"
+          value={password}
+          onChangeText={setPassword}
+          placeholder="パスワード"
+          kind="password"
+          onSubmitEditing={() => submit()}
+        />
 
-            {error && <Text style={styles.error}>{error}</Text>}
+        <AuthSubmit
+          label="ログイン"
+          error={error}
+          disabled={busy || !email.trim() || !password}
+          onPress={() => submit()}
+        />
 
-            <Pressable
-              onPress={() => submit()}
-              disabled={busy || !email.trim() || !password}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                (busy || !email.trim() || !password) && styles.disabled,
-                pressed && styles.pressed,
-              ]}>
-              <Text style={styles.primaryText}>ログイン</Text>
-            </Pressable>
+        <Pressable onPress={loginAsDemo} style={styles.demoButton}>
+          <Ionicons name="flash-outline" size={15} color={Brand.primary} />
+          <Text style={styles.demoText}>デモアカウントで入る</Text>
+        </Pressable>
+      </View>
 
-            <Pressable onPress={loginAsDemo} style={styles.demoButton}>
-              <Ionicons name="flash-outline" size={15} color={Brand.primary} />
-              <Text style={styles.demoText}>デモアカウントで入る</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>アカウントがない?</Text>
-            <Pressable onPress={() => router.push('/signup')}>
-              <Text style={styles.footerLink}>新規登録</Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  const styles = useThemedStyles(makeStyles);
-  return (
-    <View style={styles.field}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      {children}
-    </View>
+      <AuthFooterLink
+        text="アカウントがない?"
+        link="新規登録"
+        onPress={() => router.push('/signup')}
+      />
+    </AuthFormLayout>
   );
 }
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    flex: {
-      flex: 1,
-    },
-    content: {
-      flexGrow: 1,
-      justifyContent: 'center',
-      padding: Spacing.four,
-      gap: Spacing.two,
-    },
     brandMark: {
       alignSelf: 'center',
       width: 64,
@@ -164,45 +111,6 @@ const makeStyles = (c: Palette) =>
     form: {
       gap: Spacing.two,
     },
-    field: {
-      gap: 5,
-    },
-    fieldLabel: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: c.text,
-    },
-    input: {
-      backgroundColor: c.backgroundElement,
-      borderRadius: 10,
-      paddingHorizontal: Spacing.three,
-      paddingVertical: 13,
-      fontSize: 14,
-      color: c.text,
-    },
-    error: {
-      fontSize: 12,
-      fontWeight: '600',
-      color: Brand.danger,
-    },
-    primaryButton: {
-      alignItems: 'center',
-      backgroundColor: Brand.primary,
-      borderRadius: 999,
-      paddingVertical: 14,
-      marginTop: Spacing.two,
-    },
-    disabled: {
-      opacity: 0.4,
-    },
-    pressed: {
-      opacity: 0.85,
-    },
-    primaryText: {
-      fontSize: 15,
-      fontWeight: '800',
-      color: Brand.onPrimary,
-    },
     demoButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -213,22 +121,6 @@ const makeStyles = (c: Palette) =>
     demoText: {
       fontSize: 13,
       fontWeight: '700',
-      color: Brand.primary,
-    },
-    footer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 6,
-      marginTop: Spacing.three,
-    },
-    footerText: {
-      fontSize: 13,
-      color: c.textSecondary,
-    },
-    footerLink: {
-      fontSize: 13,
-      fontWeight: '800',
       color: Brand.primary,
     },
   });

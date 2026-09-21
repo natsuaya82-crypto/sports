@@ -1,11 +1,12 @@
 import { formatSlashDateWithWeekday } from '@/lib/local-date';
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SportIcon } from '@/ui/components/Icons';
+import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { Brand, Palette, Spacing, getOpportunityKindColor } from '@/ui/theme';
 import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
@@ -67,8 +68,7 @@ export default function ScheduleScreen() {
   );
 
   const renderItem = ({ item }: { item: ScheduleItem }) => (
-    <Pressable
-      style={styles.card}
+    <ListRow
       onPress={() =>
         router.push({
           pathname: '/opportunity/[id]',
@@ -80,7 +80,7 @@ export default function ScheduleScreen() {
         <Text style={styles.timeText}>{item.startTime}</Text>
       </View>
       <View style={styles.divider} />
-      <View style={styles.cardBody}>
+      <ListRowBody gap={3}>
         <View style={styles.badgeRow}>
           <View
             style={[
@@ -122,19 +122,13 @@ export default function ScheduleScreen() {
         <Text style={styles.team} numberOfLines={1}>
           {item.opportunity.hostTeamName}
         </Text>
-      </View>
-    </Pressable>
+      </ListRowBody>
+    </ListRow>
   );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>参加予定</Text>
-        <View style={styles.headerSide} />
-      </View>
+      <ScreenHeader title="参加予定" />
 
       <FlatList
         data={data}
@@ -156,32 +150,11 @@ export default function ScheduleScreen() {
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: c.background },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: { width: 32, alignItems: 'flex-start' },
-    headerTitle: { fontSize: 15, fontWeight: '700', color: c.text },
     listContent: { padding: Spacing.three, gap: Spacing.two },
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      padding: Spacing.two,
-    },
     dateCol: { width: 58, alignItems: 'center', gap: 2 },
     dateText: { fontSize: 12, fontWeight: '800', color: c.text },
     timeText: { fontSize: 11, color: c.textSecondary },
     divider: { width: StyleSheet.hairlineWidth, alignSelf: 'stretch', backgroundColor: c.border },
-    cardBody: { flex: 1, gap: 3 },
     badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
     typeBadge: {
       flexDirection: 'row',

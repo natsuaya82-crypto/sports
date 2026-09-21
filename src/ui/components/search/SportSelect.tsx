@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { SportIcon } from '@/ui/components/Icons';
-import { Brand, MaxPhoneWidth, Palette, Spacing } from '@/ui/theme';
+import { BottomSheet } from '@/ui/components/sheet/BottomSheet';
+import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { SPORTS, Sport, getSportLabel } from '@/domain/sport';
 
@@ -60,31 +61,26 @@ export function SportSheet({ visible, selected, onClose, onSelect }: SheetProps)
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} />
-      <View style={styles.sheetWrap} pointerEvents="box-none">
-        <View style={styles.sheet}>
-          <View style={styles.handle} />
-          <Text style={styles.title}>競技をえらぶ</Text>
-
+    <BottomSheet visible={visible} title="競技をえらぶ" onClose={onClose}>
+      {/* 中身の高さに合わせて伸びるシートなので、余白は本文側に置く */}
+      <View style={styles.content}>
+        <Row
+          label="すべての競技"
+          icon={<Ionicons name="apps-outline" size={18} color={colors.text} />}
+          selected={selected === null}
+          onPress={() => pick(null)}
+        />
+        {SPORTS.map((s) => (
           <Row
-            label="すべての競技"
-            icon={<Ionicons name="apps-outline" size={18} color={colors.text} />}
-            selected={selected === null}
-            onPress={() => pick(null)}
+            key={s}
+            label={getSportLabel(s)}
+            icon={<SportIcon sport={s} size={18} color={colors.text} />}
+            selected={selected === s}
+            onPress={() => pick(s)}
           />
-          {SPORTS.map((s) => (
-            <Row
-              key={s}
-              label={getSportLabel(s)}
-              icon={<SportIcon sport={s} size={18} color={colors.text} />}
-              selected={selected === s}
-              onPress={() => pick(s)}
-            />
-          ))}
-        </View>
+        ))}
       </View>
-    </Modal>
+    </BottomSheet>
   );
 }
 
@@ -138,42 +134,9 @@ const makeStyles = (c: Palette) =>
       color: Brand.onPrimary,
       fontWeight: '700',
     },
-    backdrop: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.4)',
-    },
-    sheetWrap: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-    },
-    sheet: {
-      width: '100%',
-      maxWidth: MaxPhoneWidth,
-      backgroundColor: c.background,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-      paddingTop: Spacing.two,
+    content: {
       paddingHorizontal: Spacing.three,
       paddingBottom: Spacing.four,
-    },
-    handle: {
-      alignSelf: 'center',
-      width: 36,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: c.backgroundSelected,
-    },
-    title: {
-      fontSize: 16,
-      fontWeight: '800',
-      color: c.text,
-      textAlign: 'center',
-      paddingVertical: Spacing.two,
     },
     row: {
       flexDirection: 'row',
