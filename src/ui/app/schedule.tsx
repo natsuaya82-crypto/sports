@@ -1,13 +1,37 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SportIcon } from '@/ui/components/Icons';
-import { Brand, Palette, OpportunityKindColors, Spacing } from '@/ui/theme';
+import { Brand, Palette, Spacing, getOpportunityKindColor } from '@/ui/theme';
+import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-// TODO-PORT unresolved: mockSchedule, ScheduleEntry from @/data/mock-schedule
-import { getOpportunityKindLabel } from '@/domain/opportunity';
+import { useApplications } from '@/ui/hooks/use-applications';
+import { useOpportunities } from '@/ui/hooks/use-opportunities';
+import {
+  getApplicationsByApplicant,
+  isActive,
+  type Application,
+} from '@/domain/application';
+import {
+  getEndTime,
+  getOpportunityDate,
+  getOpportunityKindLabel,
+  getStartTime,
+  type Opportunity,
+} from '@/domain/opportunity';
+
+/** 参加予定1件。応募と、その応募先の募集から組み立てる */
+interface ScheduleItem {
+  application: Application;
+  opportunity: Opportunity;
+  /** `YYYY-MM-DD` */
+  date: string;
+  startTime: string;
+  endTime: string;
+}
 
 function formatDate(date: string): string {
   const [y, m, d] = date.split('-').map(Number);
@@ -21,14 +45,39 @@ export default function ScheduleScreen() {
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
 
-  const data = [...mockSchedule].sort((a, b) => a.date.localeCompare(b.date));
+  const currentUser = useCurrentUser();
+  const applications = useApplications();
+  const opportunities = useOpportunities();
 
-  const renderItem = ({ item }: { item: ScheduleEntry }) => (
+  /**
+   * 参加予定は自分の応募のうち生きているもの(docs/DOMAIN.md 第4章)。
+   * 日程未定の常設募集は日付軸に並べられないので除く。
+   */
+  const data = useMemo(
+    () =>
+      getApplicationsByApplicant(applications, currentUser.id)
+        .filter(isActive)
+        .flatMap<ScheduleItem>((application) => {
+          const opportunity = opportunities.find((o) => o.id === application.opportunityId);
+          if (opportunity === undefined) return [];
+          const date = getOpportunityDate(opportunity);
+          const startTime = getStartTime(opportunity);
+          const endTime = getEndTime(opportunity);
+          if (date === null || startTime === null || endTime === null) return [];
+          return [{ application, opportunity, date, startTime, endTime }];
+        })
+        .sort((a, b) => a.date.localeCompare(b.date)),
+    [applications, opportunities, currentUser.id],
+  );
+
+  const renderItem = ({ item }: { item: ScheduleItem }) => (
     <Pressable
       style={styles.card}
       onPress={() =>
-        item.opportunityId &&
-        router.push({ pathname: '/opportunity/[id]', params: { id: item.opportunityId } })
+        router.push({
+          pathname: '/opportunity/[id]',
+          params: { id: item.opportunity.id },
+        })
       }>
       <View style={styles.dateCol}>
         <Text style={styles.dateText}>{formatDate(item.date)}</Text>
@@ -40,33 +89,42 @@ export default function ScheduleScreen() {
           <View
             style={[
               styles.typeBadge,
-              { backgroundColor: getOpportunityKindColor(item.type, Palette.tagText) },
+              {
+                backgroundColor: getOpportunityKindColor(
+                  item.opportunity.kind,
+                  colors.tagText,
+                ),
+              },
             ]}>
-            <SportIcon sport={item.sport} size={10} color="#ffffff" />
-            <Text style={styles.typeText}>{getOpportunityKindLabel(item.type)}</Text>
+            <SportIcon sport={item.opportunity.sport} size={10} color="#ffffff" />
+            <Text style={styles.typeText}>
+              {getOpportunityKindLabel(item.opportunity.kind)}
+            </Text>
           </View>
           <View
             style={[
               styles.statusBadge,
-              item.status === 'confirmed' ? styles.confirmed : styles.pending,
+              item.application.status === 'accepted' ? styles.confirmed : styles.pending,
             ]}>
             <Text
               style={[
                 styles.statusText,
-                item.status === 'confirmed' ? styles.confirmedText : styles.pendingText,
+                item.application.status === 'accepted'
+                  ? styles.confirmedText
+                  : styles.pendingText,
               ]}>
-              {item.status === 'confirmed' ? '参加確定' : '承認待ち'}
+              {item.application.status === 'accepted' ? '参加確定' : '承認待ち'}
             </Text>
           </View>
         </View>
         <Text style={styles.title} numberOfLines={1}>
-          {item.title}
+          {item.opportunity.title}
         </Text>
         <Text style={styles.meta} numberOfLines={1}>
-          {item.startTime}〜{item.endTime} ・ {item.venueName}
+          {item.startTime}〜{item.endTime} ・ {item.opportunity.location.name}
         </Text>
         <Text style={styles.team} numberOfLines={1}>
-          {item.teamName}
+          {item.opportunity.hostTeamName}
         </Text>
       </View>
     </Pressable>
@@ -84,7 +142,7 @@ export default function ScheduleScreen() {
 
       <FlatList
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.application.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}

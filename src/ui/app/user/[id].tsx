@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FlameIcon, SportIcon } from '@/ui/components/Icons';
+import { ProfileInfoCard } from '@/ui/components/profile/ProfileInfoCard';
 import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { findUser } from '@/data/user-store';
@@ -90,20 +91,7 @@ export default function UserProfileScreen() {
           <Text style={styles.bio}>{user.bio}</Text>
 
           {/* 詳細 */}
-          <View style={styles.infoCard}>
-            {user.position && (
-              <InfoRow icon="location-outline" label="ポジション" value={user.position} />
-            )}
-            {user.playStyle && (
-              <InfoRow icon="football-outline" label="プレー" value={user.playStyle} />
-            )}
-            {user.experience && (
-              <InfoRow icon="ribbon-outline" label="経歴" value={user.experience} />
-            )}
-            {user.availability && (
-              <InfoRow icon="time-outline" label="活動可能" value={user.availability} />
-            )}
-          </View>
+          <ProfileInfoCard user={user} />
 
           {/* 希望する参加形態(未設定なら出さない) */}
           {wantedKinds.length > 0 && (
@@ -130,26 +118,6 @@ export default function UserProfileScreen() {
         </Pressable>
       </View>
     </SafeAreaView>
-  );
-}
-
-function InfoRow({
-  icon,
-  label,
-  value,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  value: string;
-}) {
-  const { colors } = useAppTheme();
-  const styles = useThemedStyles(makeStyles);
-  return (
-    <View style={styles.infoRow}>
-      <Ionicons name={icon} size={16} color={colors.textSecondary} />
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
   );
 }
 
@@ -210,23 +178,6 @@ const makeStyles = (c: Palette) =>
     },
     sportChipText: { fontSize: 12, fontWeight: '600', color: c.text },
     bio: { fontSize: 13, lineHeight: 21, color: c.text, marginTop: 2 },
-    infoCard: {
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-      paddingHorizontal: Spacing.three,
-      paddingVertical: Spacing.two,
-      gap: 12,
-      marginTop: Spacing.one,
-    },
-    infoRow: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
-    infoLabel: {
-      width: 72,
-      fontSize: 12,
-      fontWeight: '600',
-      color: c.textSecondary,
-    },
-    infoValue: { flex: 1, fontSize: 12, fontWeight: '600', color: c.text, lineHeight: 18 },
     sectionTitle: {
       fontSize: 14,
       fontWeight: '800',

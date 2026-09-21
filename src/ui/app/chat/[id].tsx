@@ -13,7 +13,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import { sendMessage, useApplications } from '@/data/application-store';
+import { useApplications, useMessageThreads } from '@/ui/hooks/use-applications';
+import { useOpportunity } from '@/ui/hooks/use-opportunities';
+import { sendMessage } from '@/data/message-store';
 
 /** 応募のやりとり(チャット) */
 export default function ChatScreen() {
@@ -22,9 +24,11 @@ export default function ChatScreen() {
   const styles = useThemedStyles(makeStyles);
   const { id } = useLocalSearchParams<{ id: string }>();
   const application = useApplications().find((a) => a.id === id);
+  const thread = useMessageThreads().find((t) => t.applicationId === id);
+  const opportunity = useOpportunity(application?.opportunityId);
   const [draft, setDraft] = useState('');
 
-  if (!application) {
+  if (application === undefined || thread === undefined || opportunity === undefined) {
     return (
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.notFound}>
@@ -37,7 +41,7 @@ export default function ChatScreen() {
   const send = () => {
     const text = draft.trim();
     if (!text) return;
-    sendMessage(application.id, text);
+    sendMessage(thread.id, text);
     setDraft('');
   };
 
@@ -50,10 +54,10 @@ export default function ChatScreen() {
         </Pressable>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle} numberOfLines={1}>
-            {application.teamName}
+            {opportunity.hostTeamName}
           </Text>
           <Text style={styles.headerSub} numberOfLines={1}>
-            {application.opportunityTitle}
+            {opportunity.title}
           </Text>
         </View>
         <View style={styles.headerSide} />
@@ -64,11 +68,14 @@ export default function ChatScreen() {
         style={styles.messages}
         contentContainerStyle={styles.messagesContent}
         showsVerticalScrollIndicator={false}>
-        {application.messages.map((m) => (
+        {thread.messages.map((m) => (
           <View
             key={m.id}
-            style={[styles.bubble, m.from === 'me' ? styles.bubbleMe : styles.bubbleTeam]}>
-            <Text style={[styles.bubbleText, m.from === 'me' && styles.bubbleTextMe]}>
+            style={[
+              styles.bubble,
+              m.author === 'applicant' ? styles.bubbleMe : styles.bubbleTeam,
+            ]}>
+            <Text style={[styles.bubbleText, m.author === 'applicant' && styles.bubbleTextMe]}>
               {m.text}
             </Text>
           </View>

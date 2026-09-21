@@ -1,36 +1,27 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Brand, Palette, Spacing } from '@/ui/theme';
+import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import { Application, useApplications } from '@/data/application-store';
+import { useApplications } from '@/ui/hooks/use-applications';
+import { useOpportunity } from '@/ui/hooks/use-opportunities';
+import { getApplicationsByApplicant, type Application } from '@/domain/application';
 
 /** 応募履歴(マイページから) */
 export default function ApplicationsScreen() {
   const router = useRouter();
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
+  const currentUser = useCurrentUser();
   const applications = useApplications();
 
-  const renderItem = ({ item }: { item: Application }) => (
-    <Pressable
-      style={styles.row}
-      onPress={() =>
-        router.push({ pathname: '/opportunity/[id]', params: { id: item.opportunityId } })
-      }>
-      <View style={styles.statusBadge}>
-        <Text style={styles.statusText}>応募済み</Text>
-      </View>
-      <View style={styles.rowBody}>
-        <Text style={styles.rowTitle} numberOfLines={1}>
-          {item.opportunityTitle}
-        </Text>
-        <Text style={styles.rowTeam}>{item.teamName}</Text>
-      </View>
-      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-    </Pressable>
+  const myApplications = useMemo(
+    () => getApplicationsByApplicant(applications, currentUser.id),
+    [applications, currentUser.id],
   );
 
   return (
@@ -43,9 +34,9 @@ export default function ApplicationsScreen() {
         <View style={styles.headerSide} />
       </View>
       <FlatList
-        data={applications}
+        data={myApplications}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        renderItem={({ item }) => <ApplicationRow application={item} />}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
@@ -56,6 +47,41 @@ export default function ApplicationsScreen() {
         }
       />
     </SafeAreaView>
+  );
+}
+
+/**
+ * 応募1件の行。
+ * 募集のタイトル・主催チーム名は応募先のOpportunityから引く
+ * (応募側で控えを持たない = Single Source of Truth)。
+ */
+function ApplicationRow({ application }: { application: Application }) {
+  const router = useRouter();
+  const { colors } = useAppTheme();
+  const styles = useThemedStyles(makeStyles);
+  const opportunity = useOpportunity(application.opportunityId);
+  if (opportunity === undefined) return null;
+
+  return (
+    <Pressable
+      style={styles.row}
+      onPress={() =>
+        router.push({
+          pathname: '/opportunity/[id]',
+          params: { id: application.opportunityId },
+        })
+      }>
+      <View style={styles.statusBadge}>
+        <Text style={styles.statusText}>応募済み</Text>
+      </View>
+      <View style={styles.rowBody}>
+        <Text style={styles.rowTitle} numberOfLines={1}>
+          {opportunity.title}
+        </Text>
+        <Text style={styles.rowTeam}>{opportunity.hostTeamName}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+    </Pressable>
   );
 }
 

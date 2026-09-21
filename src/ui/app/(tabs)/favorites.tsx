@@ -1,23 +1,13 @@
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { OpportunityCard } from '@/ui/components/search/OpportunityCard';
+import { OpportunityGrid } from '@/ui/components/opportunity/OpportunityGrid';
 import { Palette, Spacing } from '@/ui/theme';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
-import { toggleFavorite, useFavorites } from '@/data/favorites-store';
-import { useOpportunities } from '@/data/opportunity-store';
-import type { Opportunity } from '@/domain/opportunity';
-
-const GRID_COLUMNS = 2;
-
-type Spacer = { id: string; spacer: true };
-type GridItem = Opportunity | Spacer;
-
-function isSpacer(item: GridItem): item is Spacer {
-  return 'spacer' in item;
-}
+import { useFavorites } from '@/ui/hooks/use-favorites';
+import { useOpportunities } from '@/ui/hooks/use-opportunities';
 
 /** おきにいりタブ: ハートを付けた募集の一覧 */
 export default function FavoritesScreen() {
@@ -26,45 +16,22 @@ export default function FavoritesScreen() {
   const favorites = useFavorites();
   const opportunities = useOpportunities();
 
-  const listData = useMemo<GridItem[]>(() => {
-    const items = opportunities.filter((r) => favorites.has(r.id));
-    if (items.length % GRID_COLUMNS === 0) return items;
-    return [...items, { id: 'spacer-0', spacer: true }];
-  }, [opportunities, favorites]);
-
-  const renderItem = ({ item }: { item: GridItem }) => {
-    if (isSpacer(item)) return <View style={styles.cardSpacer} />;
-    return (
-      <OpportunityCard
-        item={item}
-        isFavorite
-        onToggleFavorite={toggleFavorite}
-        onPress={(r) =>
-          router.push({ pathname: '/opportunity/[id]', params: { id: r.id } })
-        }
-      />
-    );
-  };
+  const listData = useMemo(
+    () => opportunities.filter((o) => favorites.has(o.id)),
+    [opportunities, favorites],
+  );
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <Text style={styles.screenTitle}>おきにいり</Text>
-      <FlatList
-        data={listData}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        numColumns={GRID_COLUMNS}
-        columnWrapperStyle={styles.column}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>おきにいりはまだありません</Text>
-            <Text style={styles.emptyHint}>
-              募集カードのハートを押すと、ここに保存されます
-            </Text>
-          </View>
+      <OpportunityGrid
+        items={listData}
+        favorites={favorites}
+        onPressItem={(o) =>
+          router.push({ pathname: '/opportunity/[id]', params: { id: o.id } })
         }
+        emptyTitle="おきにいりはまだありません"
+        emptyHint="募集カードのハートを押すと、ここに保存されます"
       />
     </SafeAreaView>
   );
@@ -83,32 +50,5 @@ const makeStyles = (c: Palette) =>
       paddingHorizontal: Spacing.three,
       paddingTop: Spacing.three,
       paddingBottom: Spacing.two,
-    },
-    column: {
-      gap: Spacing.two,
-      paddingHorizontal: Spacing.three,
-    },
-    cardSpacer: {
-      flex: 1,
-    },
-    listContent: {
-      gap: Spacing.two,
-      paddingBottom: 88,
-    },
-    empty: {
-      alignItems: 'center',
-      paddingTop: 80,
-      gap: Spacing.two,
-      paddingHorizontal: Spacing.four,
-    },
-    emptyTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: c.text,
-    },
-    emptyHint: {
-      fontSize: 12,
-      color: c.textSecondary,
-      textAlign: 'center',
     },
   });

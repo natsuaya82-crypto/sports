@@ -118,7 +118,7 @@ export function getOpportunityKindColor(
   kind: OpportunityKind,
   fallback: string,
 ): string {
-  return getOpportunityKindColor(kind, Palette.tagText) ?? fallback;
+  return OpportunityKindColors[kind] ?? fallback;
 }
 
 /** レベルごとのラベル色(カードのバッジと絞りこみチップで共用) */

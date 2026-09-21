@@ -6,44 +6,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ShieldIcon } from '@/ui/components/Icons';
 import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
-import { Application, useApplications } from '@/data/application-store';
+import { useApplications, useMessageThreads } from '@/ui/hooks/use-applications';
+import { useOpportunity } from '@/ui/hooks/use-opportunities';
+import { getLastMessage, type MessageThread } from '@/domain/message';
 
 /** メッセージタブ: 応募のやりとり一覧 */
 export default function MessagesScreen() {
-  const router = useRouter();
-  const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
-  const applications = useApplications();
-
-  const renderItem = ({ item }: { item: Application }) => {
-    const last = item.messages[item.messages.length - 1];
-    return (
-      <Pressable
-        style={styles.row}
-        onPress={() => router.push({ pathname: '/chat/[id]', params: { id: item.id } })}>
-        <View style={styles.avatar}>
-          <ShieldIcon size={18} color={colors.textSecondary} />
-        </View>
-        <View style={styles.rowBody}>
-          <Text style={styles.rowName} numberOfLines={1}>
-            {item.teamName}
-          </Text>
-          <Text style={styles.rowPreview} numberOfLines={1}>
-            {last ? `${last.from === 'me' ? 'あなた: ' : ''}${last.text}` : ''}
-          </Text>
-        </View>
-        <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-      </Pressable>
-    );
-  };
+  const threads = useMessageThreads();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       <Text style={styles.screenTitle}>メッセージ</Text>
       <FlatList
-        data={applications}
+        data={threads}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        renderItem={({ item }) => <ThreadRow thread={item} />}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
@@ -54,6 +32,41 @@ export default function MessagesScreen() {
         }
       />
     </SafeAreaView>
+  );
+}
+
+/**
+ * やりとり1件の行。
+ * 相手の表示名は応募先のOpportunityから引く(やりとり側で控えを持たない)。
+ */
+function ThreadRow({ thread }: { thread: MessageThread }) {
+  const router = useRouter();
+  const { colors } = useAppTheme();
+  const styles = useThemedStyles(makeStyles);
+  const application = useApplications().find((a) => a.id === thread.applicationId);
+  const opportunity = useOpportunity(application?.opportunityId);
+  if (opportunity === undefined) return null;
+
+  const last = getLastMessage(thread);
+  return (
+    <Pressable
+      style={styles.row}
+      onPress={() =>
+        router.push({ pathname: '/chat/[id]', params: { id: thread.applicationId } })
+      }>
+      <View style={styles.avatar}>
+        <ShieldIcon size={18} color={colors.textSecondary} />
+      </View>
+      <View style={styles.rowBody}>
+        <Text style={styles.rowName} numberOfLines={1}>
+          {opportunity.hostTeamName}
+        </Text>
+        <Text style={styles.rowPreview} numberOfLines={1}>
+          {last ? `${last.author === 'applicant' ? 'あなた: ' : ''}${last.text}` : ''}
+        </Text>
+      </View>
+      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+    </Pressable>
   );
 }
 
