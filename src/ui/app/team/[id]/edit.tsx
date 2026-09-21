@@ -3,6 +3,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
+import { RowGroup } from '@/ui/components/row/RowGroup';
+import { SettingRow } from '@/ui/components/row/SettingRow';
 import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { getOpportunityKindLabel } from '@/domain/opportunity';
@@ -90,14 +93,7 @@ export default function TeamEditMenuScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* ヘッダー */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>公式サイトを編集</Text>
-        <View style={styles.headerSide} />
-      </View>
+      <ScreenHeader title="公式サイトを編集" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* いまのサイトの顔(色+キャッチコピー)を常に見せる */}
@@ -106,28 +102,27 @@ export default function TeamEditMenuScreen() {
           <Text style={styles.previewTagline}>{team.tagline || 'キャッチコピー未設定'}</Text>
         </View>
 
-        <View style={styles.menuList}>
+        <RowGroup>
           {rows.map((r) => (
-            <Pressable
+            <SettingRow
               key={r.key}
-              style={styles.menuItem}
+              icon={r.icon}
+              iconSize={18}
+              label={r.title}
+              description={r.preview}
+              descriptionLines={1}
+              trailing={
+                <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+              }
               onPress={() =>
                 router.push({
                   pathname: '/team/[id]/edit/[section]',
                   params: { id: team.id, section: r.key },
                 })
-              }>
-              <Ionicons name={r.icon} size={18} color={colors.text} />
-              <View style={styles.menuBody}>
-                <Text style={styles.menuTitle}>{r.title}</Text>
-                <Text style={styles.menuPreview} numberOfLines={1}>
-                  {r.preview}
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
-            </Pressable>
+              }
+            />
           ))}
-        </View>
+        </RowGroup>
 
         <Pressable
           style={styles.siteLink}
@@ -150,32 +145,8 @@ export default function TeamEditMenuScreen() {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: {
-      width: 32,
-      alignItems: 'flex-start',
-    },
-    headerTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: c.text,
-    },
-    content: {
-      padding: Spacing.three,
-      gap: Spacing.three,
-    },
+    safeArea: { flex: 1, backgroundColor: c.background },
+    content: { padding: Spacing.three, gap: Spacing.three },
     preview: {
       borderRadius: 12,
       padding: Spacing.three,
@@ -190,33 +161,6 @@ const makeStyles = (c: Palette) =>
       fontSize: 12,
       fontWeight: '600',
       color: 'rgba(255,255,255,0.85)',
-    },
-    menuList: {
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-    },
-    menuItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.two,
-      paddingHorizontal: Spacing.three,
-      paddingVertical: 13,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    menuBody: {
-      flex: 1,
-      gap: 1,
-    },
-    menuTitle: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: c.text,
-    },
-    menuPreview: {
-      fontSize: 11,
-      color: c.textSecondary,
     },
     siteLink: {
       flexDirection: 'row',
@@ -238,14 +182,6 @@ const makeStyles = (c: Palette) =>
       color: c.textSecondary,
       textAlign: 'center',
     },
-    notFound: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    notFoundText: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: c.text,
-    },
+    notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    notFoundText: { fontSize: 14, fontWeight: '700', color: c.text },
   });

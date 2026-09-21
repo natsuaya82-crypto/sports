@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
@@ -9,9 +8,10 @@ import { findUser } from '@/data/user-store';
 import type { Application, ApplicationStatus } from '@/domain/application';
 import { getApplicationsForOpportunity } from '@/domain/application';
 import type { Opportunity } from '@/domain/opportunity';
-import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ListEmptyState } from '@/ui/components/ListEmptyState';
+import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
-import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { useApplications } from '@/ui/hooks/use-applications';
 import { useOpportunities } from '@/ui/hooks/use-opportunities';
 import { useTeam } from '@/ui/hooks/use-teams';
@@ -39,7 +39,6 @@ interface TeamApplication {
 /** 応募者の確認(チームが受け取った応募) */
 export default function ApplicantsScreen() {
   const router = useRouter();
-  const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   const { id } = useLocalSearchParams<{ id: string }>();
   const team = useTeam(id);
@@ -94,7 +93,7 @@ export default function ApplicantsScreen() {
             {application.message}
           </Text>
         </ListRowBody>
-        <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+        <ListRowChevron />
       </ListRow>
     );
   };
@@ -116,10 +115,10 @@ export default function ApplicantsScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>まだ応募がありません</Text>
-            <Text style={styles.emptyHint}>募集を出すと、応募がここに届きます</Text>
-          </View>
+          <ListEmptyState
+            title="まだ応募がありません"
+            hint="募集を出すと、応募がここに届きます"
+          />
         }
       />
     </SafeAreaView>
@@ -155,7 +154,4 @@ const makeStyles = (c: Palette) =>
     statusTextNew: { color: '#ffffff' },
     recruit: { fontSize: 11, fontWeight: '600', color: Brand.primary },
     message: { fontSize: 11, lineHeight: 16, color: c.textSecondary },
-    empty: { alignItems: 'center', paddingTop: 80, gap: Spacing.two },
-    emptyTitle: { fontSize: 15, fontWeight: '700', color: c.text },
-    emptyHint: { fontSize: 12, color: c.textSecondary },
   });

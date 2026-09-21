@@ -1,7 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { useThemedStyles } from '@/ui/contexts/theme-context';
+import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { Palette, Spacing } from '@/ui/theme';
 
 interface ListRowProps {
@@ -24,6 +25,12 @@ export function ListRow({ onPress, children }: ListRowProps) {
 /** 一覧の1行の本文(残り幅いっぱいの縦積み)。行間は画面ごとに違うのでpropsで渡す */
 export function ListRowBody({ gap, children }: { gap: number; children: ReactNode }) {
   return <View style={[styles.body, { gap }]}>{children}</View>;
+}
+
+/** 押せる行の右端に置く矢印 */
+export function ListRowChevron() {
+  const { colors } = useAppTheme();
+  return <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />;
 }
 
 const styles = StyleSheet.create({

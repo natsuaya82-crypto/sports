@@ -7,7 +7,7 @@ import { AuthField } from '@/ui/components/auth/AuthField';
 import { AuthFooterLink } from '@/ui/components/auth/AuthFooterLink';
 import { AuthFormLayout } from '@/ui/components/auth/AuthFormLayout';
 import { AuthSubmit } from '@/ui/components/auth/AuthSubmit';
-import { ScreenHeader } from '@/ui/components/row/ScreenHeader';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { AccountKind, useAuth } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { Brand, Palette, Spacing } from '@/ui/theme';
@@ -58,7 +58,7 @@ export default function SignupScreen() {
   };
 
   return (
-    <AuthFormLayout header={<ScreenHeader title="新規登録" onBack={() => router.back()} />}>
+    <AuthFormLayout header={<ScreenHeader title="新規登録" />}>
       {/* 個人 / 団体 */}
       <Text style={styles.sectionTitle}>どう使う?</Text>
       <View style={styles.kindRow}>

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,7 +12,6 @@ import { useTeam } from '@/ui/hooks/use-teams';
 
 /** メンバー管理(チームのメンバー一覧) */
 export default function MembersScreen() {
-  const router = useRouter();
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   const { id } = useLocalSearchParams<{ id: string }>();

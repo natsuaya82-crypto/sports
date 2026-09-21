@@ -5,6 +5,7 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SportIcon } from '@/ui/components/Icons';
+import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { Brand, Palette, Spacing, getOpportunityKindColor } from '@/ui/theme';
@@ -137,10 +138,10 @@ export default function ScheduleScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>参加予定はありません</Text>
-            <Text style={styles.emptyHint}>募集に応募して参加が決まると、ここに並びます</Text>
-          </View>
+          <ListEmptyState
+            title="参加予定はありません"
+            hint="募集に応募して参加が決まると、ここに並びます"
+          />
         }
       />
     </SafeAreaView>
@@ -174,7 +175,4 @@ const makeStyles = (c: Palette) =>
     title: { fontSize: 13, fontWeight: '700', color: c.text },
     meta: { fontSize: 11, color: c.textSecondary },
     team: { fontSize: 11, fontWeight: '600', color: c.textSecondary },
-    empty: { alignItems: 'center', paddingTop: 80, gap: Spacing.two },
-    emptyTitle: { fontSize: 15, fontWeight: '700', color: c.text },
-    emptyHint: { fontSize: 12, color: c.textSecondary, textAlign: 'center' },
   });

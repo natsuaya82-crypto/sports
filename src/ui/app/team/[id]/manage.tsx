@@ -6,6 +6,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SportIcon } from '@/ui/components/Icons';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
+import { RowGroup } from '@/ui/components/row/RowGroup';
 import { TeamManageRow } from '@/ui/components/team/TeamManageRow';
 import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
@@ -52,14 +54,7 @@ export default function TeamManageScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      {/* ヘッダー */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.headerSide}>
-          <Ionicons name="chevron-back" size={22} color={colors.text} />
-        </Pressable>
-        <Text style={styles.headerTitle}>チーム管理</Text>
-        <View style={styles.headerSide} />
-      </View>
+      <ScreenHeader title="チーム管理" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* チームヘッダー(カラー) */}
@@ -94,7 +89,7 @@ export default function TeamManageScreen() {
 
         {/* 管理メニュー */}
         <Text style={styles.sectionTitle}>運営</Text>
-        <View style={styles.menuList}>
+        <RowGroup>
           <TeamManageRow
             icon="megaphone-outline"
             label="募集をつくる・管理"
@@ -123,7 +118,7 @@ export default function TeamManageScreen() {
             onPress={() => go('/team/[id]/edit')}
             last
           />
-        </View>
+        </RowGroup>
 
       </ScrollView>
     </SafeAreaView>
@@ -132,32 +127,8 @@ export default function TeamManageScreen() {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: Spacing.two,
-      paddingVertical: Spacing.two,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: c.border,
-    },
-    headerSide: {
-      width: 32,
-      alignItems: 'flex-start',
-    },
-    headerTitle: {
-      fontSize: 15,
-      fontWeight: '700',
-      color: c.text,
-    },
-    content: {
-      padding: Spacing.three,
-      gap: Spacing.two,
-    },
+    safeArea: { flex: 1, backgroundColor: c.background },
+    content: { padding: Spacing.three, gap: Spacing.two },
     teamCard: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -231,11 +202,6 @@ const makeStyles = (c: Palette) =>
       color: c.text,
       marginTop: Spacing.two,
     },
-    menuList: {
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: c.border,
-      borderRadius: 12,
-    },
     note: {
       fontSize: 11,
       lineHeight: 17,
@@ -243,14 +209,6 @@ const makeStyles = (c: Palette) =>
       textAlign: 'center',
       marginTop: Spacing.two,
     },
-    notFound: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    notFoundText: {
-      fontSize: 14,
-      fontWeight: '700',
-      color: c.text,
-    },
+    notFound: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    notFoundText: { fontSize: 14, fontWeight: '700', color: c.text },
   });

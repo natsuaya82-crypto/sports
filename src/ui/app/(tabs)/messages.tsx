@@ -1,11 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ShieldIcon } from '@/ui/components/Icons';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
-import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
 import { Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { useApplications, useMessageThreads } from '@/ui/hooks/use-applications';
@@ -66,7 +65,7 @@ function ThreadRow({ thread }: { thread: MessageThread }) {
           {last ? `${last.author === 'applicant' ? 'あなた: ' : ''}${last.text}` : ''}
         </Text>
       </ListRowBody>
-      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+      <ListRowChevron />
     </ListRow>
   );
 }

@@ -1,10 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { RowGroup } from '@/ui/components/row/RowGroup';
-import { ScreenHeader } from '@/ui/components/row/ScreenHeader';
 import { SettingRow } from '@/ui/components/row/SettingRow';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAuth } from '@/ui/contexts/auth-context';
@@ -41,14 +40,13 @@ const THEME_OPTIONS: {
 ];
 
 export default function SettingsScreen() {
-  const router = useRouter();
   const { colors, mode, setMode } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   const { user, logout } = useAuth();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <ScreenHeader title="アカウント設定" onBack={() => router.back()} />
+      <ScreenHeader title="アカウント設定" />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* テーマ */}
@@ -101,15 +99,8 @@ export default function SettingsScreen() {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    safeArea: {
-      flex: 1,
-      backgroundColor: c.background,
-    },
-    content: {
-      padding: Spacing.three,
-      gap: Spacing.two,
-      paddingBottom: Spacing.six,
-    },
+    safeArea: { flex: 1, backgroundColor: c.background },
+    content: { padding: Spacing.three, gap: Spacing.two, paddingBottom: Spacing.six },
     sectionTitle: {
       fontSize: 12,
       fontWeight: '700',

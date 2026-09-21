@@ -1,15 +1,14 @@
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
-import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useCurrentUser } from '@/ui/contexts/auth-context';
-import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { useApplications } from '@/ui/hooks/use-applications';
 import { useOpportunity } from '@/ui/hooks/use-opportunities';
 import { getApplicationsByApplicant, type Application } from '@/domain/application';
@@ -52,7 +51,6 @@ export default function ApplicationsScreen() {
  */
 function ApplicationRow({ application }: { application: Application }) {
   const router = useRouter();
-  const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
   const opportunity = useOpportunity(application.opportunityId);
   if (opportunity === undefined) return null;
@@ -74,7 +72,7 @@ function ApplicationRow({ application }: { application: Application }) {
         </Text>
         <Text style={styles.rowTeam}>{opportunity.hostTeamName}</Text>
       </ListRowBody>
-      <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+      <ListRowChevron />
     </ListRow>
   );
 }
