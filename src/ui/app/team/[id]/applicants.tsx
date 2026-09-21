@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { findUser } from '@/data/user-store';
-import type { Application, ApplicationStatus } from '@/domain/application';
-import { getApplicationsForTeam } from '@/domain/application';
+import type { Application } from '@/domain/application';
+import { getApplicationsForTeam, isActive } from '@/domain/application';
 import type { Opportunity } from '@/domain/opportunity';
 import { Screen } from '@/ui/components/Screen';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
@@ -20,14 +20,14 @@ import { Brand, Palette, Spacing } from '@/ui/theme';
 /**
  * prototypeは 新着 / 返信済み / 参加確定 の3状態だったが、
  * 応募の状態は Application へ統合され、'new' と 'replied' は 'pending' に
- * まとまっている（docs/DOMAIN.md 第3章）。状態を画面側で増やさず、
- * pending は prototypeの「新着」の見た目をそのまま使う。
+ * まとまっている（docs/DOMAIN.md 第3章）。
+ *
+ * 不成立（rejected）と取り下げ（withdrawn）は一覧に出さない。
+ * 生きている応募だけを並べる（isActive）。
  */
-const STATUS_LABEL: Record<ApplicationStatus, string> = {
+const STATUS_LABEL: Record<'pending' | 'accepted', string> = {
   pending: '新着',
   accepted: '参加確定',
-  rejected: '見送り',
-  withdrawn: '取り下げ',
 };
 
 /** 応募と、その応募先の募集 */
@@ -48,12 +48,12 @@ export default function ApplicantsScreen() {
   // このチームが主催する募集に届いた応募を、prototypeと同じく新しい順で並べる
   const applicants = useMemo<TeamApplication[]>(() => {
     if (!id) return [];
-    return getApplicationsForTeam(applications, opportunities, id).flatMap(
-      (application) => {
+    return getApplicationsForTeam(applications, opportunities, id)
+      .filter(isActive)
+      .flatMap((application) => {
         const opportunity = opportunities.find((o) => o.id === application.opportunityId);
         return opportunity === undefined ? [] : [{ application, opportunity }];
-      },
-    );
+      });
   }, [id, opportunities, applications]);
 
   const renderItem = ({ item }: { item: TeamApplication }) => {
@@ -78,7 +78,7 @@ export default function ApplicantsScreen() {
             </Text>
             <View style={[styles.statusBadge, isPending && styles.statusNew]}>
               <Text style={[styles.statusText, isPending && styles.statusTextNew]}>
-                {STATUS_LABEL[application.status]}
+                {isPending ? STATUS_LABEL.pending : STATUS_LABEL.accepted}
               </Text>
             </View>
           </View>
