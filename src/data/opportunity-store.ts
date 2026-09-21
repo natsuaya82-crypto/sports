@@ -8,6 +8,7 @@ import { getDateFromToday, joinDateAndTime } from '@/lib/local-date';
 
 import { findLocationByName } from './location-store';
 import { OPPORTUNITY_SEEDS, type OpportunitySeed } from './mock/opportunity-seed';
+import { getHostUserId } from './user-store';
 import { TEAM_SEEDS } from './mock/team-seed';
 
 /** 主催チーム名から登録済みチームを引く。未登録の主催は hostTeamId が null になる */
@@ -15,17 +16,9 @@ function findHostTeamId(teamName: string): string | null {
   return TEAM_SEEDS.find((t) => t.name === teamName)?.id ?? null;
 }
 
-/**
- * 主催User。
- * 主催は常にUserである（docs/DOMAIN.md 第2章）。モック段階ではチームごとに
- * 主催Userを1人置いた扱いにし、チーム名から決まるIDを与えている。
- */
-function getHostUserId(teamName: string): string {
-  return `u-host-${teamName}`;
-}
-
 function toOpportunity(seed: OpportunitySeed, index: number): Opportunity {
   const date = getDateFromToday(seed.dayOffset);
+  const hostTeamId = findHostTeamId(seed.teamName);
   return {
     id: `r${index + 1}`,
     kind: seed.kind,
@@ -39,8 +32,8 @@ function toOpportunity(seed: OpportunitySeed, index: number): Opportunity {
     level: seed.level,
     capacity: seed.capacity,
     filledCount: seed.filledCount,
-    hostUserId: getHostUserId(seed.teamName),
-    hostTeamId: findHostTeamId(seed.teamName),
+    hostUserId: getHostUserId(hostTeamId, seed.teamName),
+    hostTeamId,
     hostTeamName: seed.teamName,
     photo: `https://picsum.photos/seed/sports${index + 7}/400/300`,
     status: seed.closed === true ? 'closed' : 'open',
@@ -70,7 +63,7 @@ function toStandingOpportunity(team: Team): Opportunity {
     level: team.level,
     capacity: team.memberCount ?? 1,
     filledCount: 0,
-    hostUserId: getHostUserId(team.name),
+    hostUserId: getHostUserId(team.id, team.name),
     hostTeamId: team.id,
     hostTeamName: team.name,
     photo: team.photo,

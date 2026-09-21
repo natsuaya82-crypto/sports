@@ -7,7 +7,8 @@ import { APPLICATION_SEEDS } from '../mock/application-seed';
 import { TEAM_SEEDS } from '../mock/team-seed';
 import { teamSchema } from '@/domain/team';
 import { USER_SEEDS } from '../mock/user-seed';
-import { userSchema } from '@/domain/user';
+import { fetchUsers, findUser } from '../user-store';
+import { findScoutCandidates , userSchema } from '@/domain/user';
 
 describe('募集の組み立て', () => {
   const opportunities = opportunityStore.getSnapshot();
@@ -43,6 +44,36 @@ describe('募集の組み立て', () => {
       expect(opportunity.kind).toBe('team_member');
       expect(opportunity.hostTeamId).not.toBeNull();
       expect(opportunity.endsAt).toBeNull();
+    }
+  });
+
+  it('主催Userが必ず実在する', () => {
+    for (const opportunity of opportunities) {
+      expect(findUser(opportunity.hostUserId)).toBeDefined();
+    }
+  });
+
+  it('デモユーザーが管理するチームの募集は本人が主催になる', () => {
+    const demo = USER_SEEDS[0];
+    const hosted = opportunities.filter(
+      (o) => o.hostTeamId !== null && demo.managedTeamIds.includes(o.hostTeamId),
+    );
+    expect(hosted.length).toBeGreaterThan(0);
+    for (const opportunity of hosted) {
+      expect(opportunity.hostUserId).toBe(demo.id);
+    }
+  });
+
+  it('主催Userはスカウトの候補に出ない', () => {
+    const hostIds = new Set(opportunities.map((o) => o.hostUserId));
+    const candidates = findScoutCandidates(fetchUsers(), {
+      viewerId: 'nobody',
+      sport: null,
+      keyword: '',
+    });
+    for (const candidate of candidates) {
+      if (candidate.id === USER_SEEDS[0].id) continue;
+      expect(hostIds.has(candidate.id)).toBe(false);
     }
   });
 
