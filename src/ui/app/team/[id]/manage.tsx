@@ -1,3 +1,4 @@
+import { getOpportunitiesForTeam } from '@/domain/opportunity';
 import { useApplications } from '@/ui/hooks/use-applications';
 import {
   countPendingApplications,
@@ -32,7 +33,7 @@ export default function TeamManageScreen() {
   const applications = useApplications();
 
   const activeCount = useMemo(
-    () => (team ? opportunities.filter((o) => o.hostTeamId === team.id).length : 0),
+    () => (team ? getOpportunitiesForTeam(opportunities, team.id).length : 0),
     [team, opportunities],
   );
 

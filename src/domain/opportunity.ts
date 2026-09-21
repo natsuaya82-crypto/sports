@@ -174,3 +174,11 @@ export function compareByStartDate(a: Opportunity, b: Opportunity): number {
   if (dateB === null) return -1;
   return dateA.localeCompare(dateB);
 }
+
+/** 指定したチームが主催する募集 */
+export function getOpportunitiesForTeam(
+  opportunities: readonly Opportunity[],
+  teamId: string,
+): Opportunity[] {
+  return opportunities.filter((o) => o.hostTeamId === teamId);
+}

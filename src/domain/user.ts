@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { levelSchema } from './level';
 import { opportunityKindSchema } from './opportunity';
 import { prefectureSchema } from './prefecture';
-import { sportSchema } from './sport';
+import { sportSchema, type Sport } from './sport';
 
 /**
  * ユーザー。
@@ -57,4 +57,47 @@ export function canManageTeam(user: User, teamId: string): boolean {
 /** スカウト対象として公開できるだけの情報が入っているか */
 export function hasPublicProfile(user: User): boolean {
   return user.playStyle !== undefined && user.experience !== undefined;
+}
+
+/** 指定した種目をやっているか。種目未指定ならすべて通す */
+function playsSport(user: User, sport: Sport | null): boolean {
+  return sport === null || user.sports.includes(sport);
+}
+
+/** 名前・エリア・ポジション・プレースタイルのいずれかに一致するか */
+function matchesKeyword(user: User, keyword: string): boolean {
+  if (keyword === '') return true;
+  return (
+    user.displayName.includes(keyword) ||
+    user.ward.includes(keyword) ||
+    (user.position?.includes(keyword) ?? false) ||
+    (user.playStyle?.includes(keyword) ?? false)
+  );
+}
+
+/**
+ * スカウトの候補を絞りこむ。
+ *
+ * 公開プロフィールが入っていない人と、自分自身は候補に出さない。
+ */
+export function findScoutCandidates(
+  users: readonly User[],
+  options: { viewerId: string; sport: Sport | null; keyword: string },
+): User[] {
+  const keyword = options.keyword.trim();
+  return users.filter(
+    (u) =>
+      u.id !== options.viewerId &&
+      hasPublicProfile(u) &&
+      playsSport(u, options.sport) &&
+      matchesKeyword(u, keyword),
+  );
+}
+
+/** そのユーザーが管理しているチーム */
+export function getManagedTeams<T extends { id: string }>(
+  teams: readonly T[],
+  user: User,
+): T[] {
+  return teams.filter((t) => canManageTeam(user, t.id));
 }

@@ -15,24 +15,9 @@ import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
 import { fetchUsers } from '@/data/user-store';
 import { SPORTS, Sport, getSportLabel } from '@/domain/sport';
-import { getMainSport, hasPublicProfile, type User } from '@/domain/user';
+import { findScoutCandidates, getMainSport, type User } from '@/domain/user';
 
 /** 競技の絞りこみ。メイン競技だけでなく登録している種目すべてを見る */
-function matchesSport(user: User, sport: Sport | null): boolean {
-  return sport === null || user.sports.includes(sport);
-}
-
-/** ポジション・エリア・名前での検索 */
-function matchesQuery(user: User, query: string): boolean {
-  if (query === '') return true;
-  return (
-    user.displayName.includes(query) ||
-    user.ward.includes(query) ||
-    (user.position?.includes(query) ?? false) ||
-    (user.playStyle?.includes(query) ?? false)
-  );
-}
-
 /** メイン競技の表示名。種目が未登録なら表示しない */
 function mainSportLabel(user: User): string | undefined {
   const sport = getMainSport(user);
@@ -52,16 +37,15 @@ export default function ScoutScreen() {
     (sportParam as Sport | undefined) ?? null,
   );
 
-  const listData = useMemo(() => {
-    const q = query.trim();
-    return fetchUsers().filter(
-      (u) =>
-        u.id !== currentUser.id &&
-        hasPublicProfile(u) &&
-        matchesSport(u, sport) &&
-        matchesQuery(u, q),
-    );
-  }, [query, sport, currentUser.id]);
+  const listData = useMemo(
+    () =>
+      findScoutCandidates(fetchUsers(), {
+        viewerId: currentUser.id,
+        sport,
+        keyword: query,
+      }),
+    [query, sport, currentUser.id],
+  );
 
   const renderItem = ({ item }: { item: User }) => (
     <ListRow

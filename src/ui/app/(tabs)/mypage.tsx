@@ -1,3 +1,4 @@
+import { getManagedTeams } from '@/domain/user';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
@@ -45,7 +46,7 @@ export default function MyPageScreen() {
   const teams = useTeams();
 
   const managedTeams = useMemo(
-    () => teams.filter((t) => user.managedTeamIds.includes(t.id)),
+    () => getManagedTeams(teams, user),
     [teams, user],
   );
 

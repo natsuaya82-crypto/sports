@@ -1,3 +1,4 @@
+import { getManagedTeams } from '@/domain/user';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
@@ -39,7 +40,7 @@ export default function PostScreen() {
   const user = useCurrentUser();
   const teams = useTeams();
   const myTeams = useMemo(
-    () => teams.filter((t) => user.managedTeamIds.includes(t.id)),
+    () => getManagedTeams(teams, user),
     [teams, user],
   );
 

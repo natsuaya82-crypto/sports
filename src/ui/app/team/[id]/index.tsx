@@ -1,4 +1,4 @@
-import { compareByStartDate } from '@/domain/opportunity';
+import { compareByStartDate, getOpportunitiesForTeam } from '@/domain/opportunity';
 import { Screen } from '@/ui/components/Screen';
 import { NotFoundScreen } from '@/ui/components/NotFoundScreen';
 import { useLocalSearchParams } from 'expo-router';
@@ -34,9 +34,7 @@ export default function TeamSiteScreen() {
 
   const opportunities = useMemo(() => {
     if (!team) return [];
-    return allOpportunities
-      .filter((o) => o.hostTeamId === team.id)
-      .sort(compareByStartDate);
+    return getOpportunitiesForTeam(allOpportunities, team.id).sort(compareByStartDate);
   }, [team, allOpportunities]);
 
   if (!team) {
