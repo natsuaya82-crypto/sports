@@ -16,7 +16,7 @@ import type { User } from './user';
  * 相対順位ではなく、条件を満たしたら付く印。他人との順位を作らないので、
  * 累計の件数を使っても「先に始めた人ほど有利」にはならない。
  */
-export type BadgeKey =
+type BadgeKey =
   | 'newcomer'
   | 'reliable'
   | 'veteran'
