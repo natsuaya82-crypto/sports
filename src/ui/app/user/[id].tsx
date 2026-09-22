@@ -8,11 +8,15 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { BadgeList } from '@/ui/components/BadgeList';
 import { FlameIcon, SportIcon } from '@/ui/components/Icons';
 import { ProfileInfoCard } from '@/ui/components/profile/ProfileInfoCard';
 import { Brand, LevelColors, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { useParticipations } from '@/ui/hooks/use-participations';
 import { findUser } from '@/data/user-store';
+import { getDateFromToday } from '@/lib/local-date';
+import { getUserBadges } from '@/domain/badge';
 import { getLevelLabel } from '@/domain/level';
 import { getOpportunityKindLabel } from '@/domain/opportunity';
 import { getSportLabel } from '@/domain/sport';
@@ -25,6 +29,7 @@ export default function UserProfileScreen() {
   const styles = useThemedStyles(makeStyles);
   const { id } = useLocalSearchParams<{ id: string }>();
   const user = findUser(id ?? '');
+  const records = useParticipations();
 
   if (!user) {
     return (
@@ -34,6 +39,7 @@ export default function UserProfileScreen() {
 
   const mainSport = getMainSport(user);
   const wantedKinds = user.wantedKinds ?? [];
+  const badges = getUserBadges(user, records, getDateFromToday(0));
 
   return (
     <Screen edges={[]}>
@@ -69,6 +75,11 @@ export default function UserProfileScreen() {
                 {user.level === 'serious' && <FlameIcon size={10} color="#ffffff" />}
                 <Text style={styles.heroChipText}>{getLevelLabel(user.level)}</Text>
               </View>
+              <BadgeList
+                badges={badges}
+                style={styles.heroBadge}
+                textStyle={styles.heroBadgeText}
+              />
             </View>
           </View>
         </View>
@@ -160,6 +171,9 @@ const makeStyles = (c: Palette) =>
       paddingVertical: 4,
     },
     heroChipText: { fontSize: 11, fontWeight: '700', color: '#ffffff' },
+    // 色はタグのまま、大きさだけ隣のチップに揃える
+    heroBadge: { paddingHorizontal: 10, paddingVertical: 4 },
+    heroBadgeText: { fontSize: 11, fontWeight: '700' },
     body: { padding: Spacing.three, gap: Spacing.two },
     sportsRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
     sportChip: {
