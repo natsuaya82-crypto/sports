@@ -2,21 +2,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { BadgeList } from '@/ui/components/BadgeList';
 import { LevelBadge } from '@/ui/components/LevelBadge';
 import { SportIcon } from '@/ui/components/Icons';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import type { Badge } from '@/domain/badge';
 import { getOpportunityKindLabel } from '@/domain/opportunity';
 import { getSportLabel } from '@/domain/sport';
 import type { Team } from '@/domain/team';
 
 interface Props {
   team: Team;
+  /** 到達型バッジ。判定は domain（getTeamBadges）が持つ */
+  badges: readonly Badge[];
   onPress?: (team: Team) => void;
 }
 
 /** チームでさがす画面の1行カード(チームLPの入口) */
-export function TeamCard({ team, onPress }: Props) {
+export function TeamCard({ team, badges, onPress }: Props) {
   const { colors } = useAppTheme();
   const styles = useThemedStyles(makeStyles);
 
@@ -59,6 +63,7 @@ export function TeamCard({ team, onPress }: Props) {
             style={styles.levelBadge}
             textStyle={styles.levelText}
           />
+          <BadgeList badges={badges} />
           {team.recruitingKinds.length > 0 ? (
             team.recruitingKinds.map((r) => (
               <View key={r} style={styles.recruitBadge}>

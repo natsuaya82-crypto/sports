@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
+import { BadgeList } from '@/ui/components/BadgeList';
 import { LevelBadge } from '@/ui/components/LevelBadge';
 import { Screen } from '@/ui/components/Screen';
 import { SportIcon } from '@/ui/components/Icons';
@@ -13,7 +14,11 @@ import { SelectableChip } from '@/ui/components/SelectableChip';
 import { Palette, Spacing } from '@/ui/theme';
 import { useCurrentUser } from '@/ui/contexts/auth-context';
 import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { useParticipations } from '@/ui/hooks/use-participations';
 import { fetchUsers } from '@/data/user-store';
+import { getDateFromToday } from '@/lib/local-date';
+import { getUserBadges } from '@/domain/badge';
+import { getCriteriaFromUser, rankUsers } from '@/domain/discovery';
 import { SPORTS, Sport, getSportLabel } from '@/domain/sport';
 import { findScoutCandidates, getMainSport, type User } from '@/domain/user';
 
@@ -31,6 +36,8 @@ export default function ScoutScreen() {
   const styles = useThemedStyles(makeStyles);
   const { sport: sportParam } = useLocalSearchParams<{ sport?: string }>();
   const currentUser = useCurrentUser();
+  const records = useParticipations();
+  const today = getDateFromToday(0);
 
   const [query, setQuery] = useState('');
   const [sport, setSport] = useState<Sport | null>(
@@ -39,12 +46,15 @@ export default function ScoutScreen() {
 
   const listData = useMemo(
     () =>
-      findScoutCandidates(fetchUsers(), {
-        viewerId: currentUser.id,
-        sport,
-        keyword: query,
-      }),
-    [query, sport, currentUser.id],
+      rankUsers(
+        findScoutCandidates(fetchUsers(), {
+          viewerId: currentUser.id,
+          sport,
+          keyword: query,
+        }),
+        { criteria: getCriteriaFromUser(currentUser), records, today },
+      ),
+    [query, sport, currentUser, records, today],
   );
 
   const renderItem = ({ item }: { item: User }) => (
@@ -62,6 +72,11 @@ export default function ScoutScreen() {
           <LevelBadge
             level={item.level}
             iconSize={9}
+            style={styles.levelBadge}
+            textStyle={styles.levelText}
+          />
+          <BadgeList
+            badges={getUserBadges(item, records, today)}
             style={styles.levelBadge}
             textStyle={styles.levelText}
           />

@@ -79,7 +79,7 @@ export function getCriteriaFromUser(user: User): MatchCriteria {
   };
 }
 
-export function getTeamAsTarget(team: Team): MatchTarget {
+function getTeamAsTarget(team: Team): MatchTarget {
   return {
     sports: [team.sport],
     level: team.level,
@@ -89,7 +89,7 @@ export function getTeamAsTarget(team: Team): MatchTarget {
   };
 }
 
-export function getUserAsTarget(user: User): MatchTarget {
+function getUserAsTarget(user: User): MatchTarget {
   return {
     sports: user.sports,
     level: user.level,

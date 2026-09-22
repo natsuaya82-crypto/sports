@@ -7,13 +7,17 @@ import { findUser } from '@/data/user-store';
 import type { Application } from '@/domain/application';
 import { getApplicationsForTeam, isActive } from '@/domain/application';
 import type { Opportunity } from '@/domain/opportunity';
+import { getAttendanceOf } from '@/domain/participation';
+import { getDateFromToday } from '@/lib/local-date';
 import { Screen } from '@/ui/components/Screen';
 import { ListEmptyState } from '@/ui/components/ListEmptyState';
 import { ListRow, ListRowBody, ListRowChevron } from '@/ui/components/list/ListRow';
 import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
+import { ApplicationReviewActions } from '@/ui/components/review/ApplicationReviewActions';
 import { useThemedStyles } from '@/ui/contexts/theme-context';
 import { useApplications } from '@/ui/hooks/use-applications';
 import { useOpportunities } from '@/ui/hooks/use-opportunities';
+import { useParticipations } from '@/ui/hooks/use-participations';
 import { useTeam } from '@/ui/hooks/use-teams';
 import { Brand, Palette, Spacing } from '@/ui/theme';
 
@@ -44,6 +48,8 @@ export default function ApplicantsScreen() {
   const team = useTeam(id);
   const applications = useApplications();
   const opportunities = useOpportunities();
+  const participations = useParticipations();
+  const today = getDateFromToday(0);
 
   // このチームが主催する募集に届いた応募を、prototypeと同じく新しい順で並べる
   const applicants = useMemo<TeamApplication[]>(() => {
@@ -88,6 +94,12 @@ export default function ApplicantsScreen() {
           <Text style={styles.message} numberOfLines={2}>
             {application.message}
           </Text>
+          <ApplicationReviewActions
+            application={application}
+            opportunity={opportunity}
+            attendance={getAttendanceOf(participations, application.id)}
+            today={today}
+          />
         </ListRowBody>
         <ListRowChevron />
       </ListRow>

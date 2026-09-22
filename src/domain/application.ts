@@ -10,7 +10,6 @@ const applicationStatusSchema = z.enum([
   'withdrawn',
 ]);
 
-export type ApplicationStatus = z.infer<typeof applicationStatusSchema>;
 
 /**
  * 応募。
