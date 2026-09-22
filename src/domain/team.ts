@@ -74,6 +74,11 @@ export const teamSchema = z.object({
   color: z.string(),
   /** 活動写真 */
   gallery: z.array(z.string()),
+  /**
+   * アプリに登録した日（`YYYY-MM-DD`）。新規枠とバッジの判定に使う（docs/DOMAIN.md 9.4）。
+   * 創設年（founded）とは別。昔からあるチームでも、アプリには最近来たことがある。
+   */
+  registeredAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 
   /** 以下は決まっていないチームもあるため任意。あるものだけ表示する */
   homeGround: z.string().optional(),

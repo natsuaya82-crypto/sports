@@ -27,6 +27,8 @@ export const userSchema = z.object({
   level: levelSchema,
   /** 管理しているチームのID。モック段階ではこれがチーム権限の判定元 */
   managedTeamIds: z.array(z.string()),
+  /** アプリに登録した日（`YYYY-MM-DD`）。新規枠とバッジの判定に使う（docs/DOMAIN.md 9.4） */
+  registeredAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 
   /** 以下は個人LPの項目。未入力なら未設定（企画書 第4章 個人LP） */
   /** 例: '20代' */

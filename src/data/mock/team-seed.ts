@@ -1,4 +1,5 @@
 import type { Team } from '@/domain/team';
+import { getDateFromToday } from '@/lib/local-date';
 
 function gallery(seed: string): string[] {
   return [
@@ -16,12 +17,16 @@ function gallery(seed: string): string[] {
  *
  * recruiting は docs/DOMAIN.md 第8章の対応表に従い recruitingKinds へ、
  * 公開名簿の members は roster へ置き換えた。
+ * registeredAt はアプリへの登録日（docs/DOMAIN.md 9.4）。デモが日付とともに
+ * 古びないよう、今日からの相対日数で持つ。一部を30日以内にして新規枠を確かめられるようにしている。
+ *
  * prefecture は prototype のチーム検索が画面側で '東京都' 固定で判定して
  * いたものをデータへ移したもので、絞りこみの結果は変わらない。
  */
 export const TEAM_SEEDS: readonly Team[] = [
   {
     id: 't1',
+    registeredAt: getDateFromToday(-420),
     name: 'FC世田谷',
     sport: 'soccer',
     prefecture: '東京都',
@@ -91,6 +96,7 @@ export const TEAM_SEEDS: readonly Team[] = [
   },
   {
     id: 't2',
+    registeredAt: getDateFromToday(-300),
     name: '朝ソサイチ駒沢',
     sport: 'soccer',
     prefecture: '東京都',
@@ -112,6 +118,7 @@ export const TEAM_SEEDS: readonly Team[] = [
   },
   {
     id: 't3',
+    registeredAt: getDateFromToday(-260),
     name: 'IKEBUKURO HOOPS',
     sport: 'basketball',
     prefecture: '東京都',
@@ -157,6 +164,7 @@ export const TEAM_SEEDS: readonly Team[] = [
   {
     // 創設年も年齢層も特に決めていない、ゆるく続いている草野球チーム
     id: 't4',
+    registeredAt: getDateFromToday(-380),
     name: '多摩川ベアーズ',
     sport: 'baseball',
     prefecture: '東京都',
@@ -176,6 +184,7 @@ export const TEAM_SEEDS: readonly Team[] = [
   {
     // 体育館は毎回抽選・人数も流動的・戦績なし。それでも成立するのがこのサイトの狙い
     id: 't5',
+    registeredAt: getDateFromToday(-12),
     name: 'すぎなみMIX',
     sport: 'volleyball',
     prefecture: '東京都',
@@ -192,6 +201,7 @@ export const TEAM_SEEDS: readonly Team[] = [
   },
   {
     id: 't6',
+    registeredAt: getDateFromToday(-200),
     name: 'アデランテ足立',
     sport: 'soccer',
     prefecture: '東京都',
@@ -214,6 +224,7 @@ export const TEAM_SEEDS: readonly Team[] = [
   {
     // 活動は毎週水曜のみ・戦績という概念がないランニングコミュニティ
     id: 't7',
+    registeredAt: getDateFromToday(-150),
     name: '皇居ランナーズ',
     sport: 'running',
     prefecture: '東京都',
@@ -233,6 +244,7 @@ export const TEAM_SEEDS: readonly Team[] = [
   },
   {
     id: 't8',
+    registeredAt: getDateFromToday(-6),
     name: 'トヨスFC',
     sport: 'futsal',
     prefecture: '東京都',

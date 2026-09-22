@@ -100,11 +100,15 @@ export const opportunitySchema = z.object({
   level: levelSchema,
   capacity: z.number().int().positive(),
   /**
-   * 埋まった人数。
-   * docs/DOMAIN.md 第4章では accepted な Application の件数が参加の実体になる。
-   * モック段階では集計元が無いため値を持つ。Supabase導入時に集計へ置き換える。
+   * 主催者がアプリ外で既に確保している人数（docs/DOMAIN.md 9.3）。
+   * 主催者の入力値なので保存する。
    */
-  filledCount: z.number().int().min(0),
+  reservedCount: z.number().int().min(0),
+  /**
+   * アプリで受理された応募の件数。
+   * **保存しない**。data層が読み出し時に Application から数えて埋める（9.1 / 9.3）。
+   */
+  acceptedCount: z.number().int().min(0),
   /** 主催は常にUser。Teamとして主催する場合のみ hostTeamId が入る（docs/DOMAIN.md 第2章） */
   hostUserId: z.string(),
   hostTeamId: z.string().nullable(),
@@ -116,9 +120,14 @@ export const opportunitySchema = z.object({
 
 export type Opportunity = z.infer<typeof opportunitySchema>;
 
+/** 埋まっている人数。アプリ外の確保分と受理済みの応募の合計 */
+export function getFilledCount(opportunity: Opportunity): number {
+  return opportunity.reservedCount + opportunity.acceptedCount;
+}
+
 /** 残り枠数 */
 export function getRemainingCapacity(opportunity: Opportunity): number {
-  return Math.max(0, opportunity.capacity - opportunity.filledCount);
+  return Math.max(0, opportunity.capacity - getFilledCount(opportunity));
 }
 
 export function isFull(opportunity: Opportunity): boolean {

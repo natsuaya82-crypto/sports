@@ -1,11 +1,13 @@
+import type { Application } from '@/domain/application';
 import type { Opportunity, OpportunityKind } from '@/domain/opportunity';
 import type { Location } from '@/domain/location';
 import type { Team } from '@/domain/team';
 import type { Level } from '@/domain/level';
 import type { Sport } from '@/domain/sport';
-import { createStore, type ReadableStore } from '@/lib/observable-store';
+import { combineStores, createStore, type ReadableStore } from '@/lib/observable-store';
 import { getDateFromToday, joinDateAndTime } from '@/lib/local-date';
 
+import { applicationStore } from './application-store';
 import { findLocationByName } from './location-store';
 import { OPPORTUNITY_SEEDS, type OpportunitySeed } from './mock/opportunity-seed';
 import { getHostUserId } from './user-store';
@@ -16,7 +18,13 @@ function findHostTeamId(teamName: string): string | null {
   return TEAM_SEEDS.find((t) => t.name === teamName)?.id ?? null;
 }
 
-function toOpportunity(seed: OpportunitySeed, index: number): Opportunity {
+/**
+ * 保存する形。受理済みの件数は持たない（docs/DOMAIN.md 9.1 / 9.3）。
+ * 読み出すときに応募から数えて Opportunity にする。
+ */
+type StoredOpportunity = Omit<Opportunity, 'acceptedCount'>;
+
+function toOpportunity(seed: OpportunitySeed, index: number): StoredOpportunity {
   const date = getDateFromToday(seed.dayOffset);
   const hostTeamId = findHostTeamId(seed.teamName);
   return {
@@ -31,7 +39,7 @@ function toOpportunity(seed: OpportunitySeed, index: number): Opportunity {
     fee: seed.fee,
     level: seed.level,
     capacity: seed.capacity,
-    filledCount: seed.filledCount,
+    reservedCount: seed.reservedCount,
     hostUserId: getHostUserId(hostTeamId, seed.teamName),
     hostTeamId,
     hostTeamName: seed.teamName,
@@ -49,7 +57,7 @@ function toOpportunity(seed: OpportunitySeed, index: number): Opportunity {
  * Opportunity でなければ Application が表現できない（docs/DOMAIN.md 第3章）。
  * 日程が決まっていないため startsAt / endsAt は null で、日付軸の一覧には出ない。
  */
-function toStandingOpportunity(team: Team): Opportunity {
+function toStandingOpportunity(team: Team): StoredOpportunity {
   return {
     id: `standing-${team.id}`,
     kind: 'team_member',
@@ -62,7 +70,7 @@ function toStandingOpportunity(team: Team): Opportunity {
     fee: 0,
     level: team.level,
     capacity: team.memberCount ?? 1,
-    filledCount: 0,
+    reservedCount: 0,
     hostUserId: getHostUserId(team.id, team.name),
     hostTeamId: team.id,
     hostTeamName: team.name,
@@ -71,15 +79,36 @@ function toStandingOpportunity(team: Team): Opportunity {
   };
 }
 
-const store = createStore<readonly Opportunity[]>([
+const store = createStore<readonly StoredOpportunity[]>([
   ...OPPORTUNITY_SEEDS.map(toOpportunity),
   ...TEAM_SEEDS.filter((t) => t.recruitingKinds.includes('team_member')).map(
     toStandingOpportunity,
   ),
 ]);
 
-/** 募集一覧の購読口。Reactへの接続は ui 側の hook が行う */
-export const opportunityStore: ReadableStore<readonly Opportunity[]> = store;
+function countAccepted(applications: readonly Application[]): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const a of applications) {
+    if (a.status !== 'accepted') continue;
+    counts.set(a.opportunityId, (counts.get(a.opportunityId) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
+ * 募集一覧の購読口。Reactへの接続は ui 側の hook が行う。
+ *
+ * 受理済みの件数は、応募が変わるたびにここで数え直す。
+ * 応募を受理すれば残り枠が減り、カウンタを別に更新する必要が無い。
+ */
+export const opportunityStore: ReadableStore<readonly Opportunity[]> = combineStores(
+  store,
+  applicationStore,
+  (opportunities, applications) => {
+    const accepted = countAccepted(applications);
+    return opportunities.map((o) => ({ ...o, acceptedCount: accepted.get(o.id) ?? 0 }));
+  },
+);
 
 /** 作成時に画面から受け取る値。IDや写真など保存側で決まるものは含まない */
 export interface NewOpportunityInput {
@@ -101,9 +130,9 @@ export interface NewOpportunityInput {
 }
 
 /** 募集を作成して一覧の先頭に追加する */
-export function createOpportunity(input: NewOpportunityInput): Opportunity {
+export function createOpportunity(input: NewOpportunityInput): StoredOpportunity {
   const id = `r-user-${Date.now()}`;
-  const created: Opportunity = {
+  const created: StoredOpportunity = {
     id,
     kind: input.kind,
     sport: input.sport,
@@ -116,7 +145,7 @@ export function createOpportunity(input: NewOpportunityInput): Opportunity {
     fee: input.fee,
     level: input.level,
     capacity: input.capacity,
-    filledCount: 0,
+    reservedCount: 0,
     hostUserId: input.hostUserId,
     hostTeamId: input.hostTeamId,
     hostTeamName: input.hostTeamName,

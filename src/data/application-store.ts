@@ -2,35 +2,22 @@ import type { Application } from '@/domain/application';
 import { createStore, type ReadableStore } from '@/lib/observable-store';
 
 import { APPLICATION_SEEDS } from './mock/application-seed';
-import { opportunityStore } from './opportunity-store';
 
-/** タイトルから募集IDを引く。見つからない種は読み込まない */
-function findOpportunityIdByTitle(title: string): string | undefined {
-  return opportunityStore.getSnapshot().find((o) => o.title === title)?.id;
-}
-
-function toApplications(): Application[] {
-  return APPLICATION_SEEDS.flatMap((seed) => {
-    const opportunityId = findOpportunityIdByTitle(seed.opportunityTitle);
-    if (opportunityId === undefined) return [];
-    return [
-      {
-        id: seed.id,
-        opportunityId,
-        applicantUserId: seed.applicantUserId,
-        applicantTeamId: seed.applicantTeamId,
-        status: seed.status,
-        message: seed.message,
-        createdAt: seed.createdAt,
-      },
-    ];
-  });
-}
-
-const store = createStore<readonly Application[]>(toApplications());
+/**
+ * 応募のストア。
+ *
+ * 募集（opportunity-store）を参照しない。募集側が受理済みの件数を数えるために
+ * こちらを読むので、逆向きに依存すると循環する（CLAUDE.md 第4章）。
+ */
+const store = createStore<readonly Application[]>(APPLICATION_SEEDS);
 
 /** 応募一覧の購読口 */
 export const applicationStore: ReadableStore<readonly Application[]> = store;
+
+/** 応募の状態を変える。受理できるかの判定は呼び出し側（application-review）が行う */
+export function setApplicationStatus(id: string, status: Application['status']): void {
+  store.update((current) => current.map((a) => (a.id === id ? { ...a, status } : a)));
+}
 
 let sequence = 0;
 

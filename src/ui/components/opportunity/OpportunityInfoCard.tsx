@@ -3,11 +3,12 @@ import { formatMonthDayWithWeekday } from '@/lib/local-date';
 import { InfoCard, InfoRow } from '@/ui/components/list/InfoCard';
 import { Spacing } from '@/ui/theme';
 import {
+  type Opportunity,
   getEndTime,
+  getFilledCount,
   getOpportunityDate,
   getStartTime,
   isScheduled,
-  type Opportunity,
 } from '@/domain/opportunity';
 import { getSportLabel } from '@/domain/sport';
 
@@ -60,7 +61,7 @@ export function OpportunityInfoCard({ opportunity }: { opportunity: Opportunity 
       <InfoRow
         icon="people-outline"
         label="募集人数"
-        value={`${opportunity.capacity}人(${opportunity.filledCount}人参加済み)`}
+        value={`${opportunity.capacity}人(${getFilledCount(opportunity)}人参加済み)`}
         labelWidth={LABEL_WIDTH}
       />
     </InfoCard>

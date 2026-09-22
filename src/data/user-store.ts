@@ -1,6 +1,8 @@
 import type { Team } from '@/domain/team';
 import type { User } from '@/domain/user';
 
+import { getDateFromToday } from '@/lib/local-date';
+
 import { OPPORTUNITY_SEEDS } from './mock/opportunity-seed';
 import { TEAM_SEEDS } from './mock/team-seed';
 import { USER_SEEDS } from './mock/user-seed';
@@ -28,6 +30,7 @@ function toHostUser(team: Team): User {
     sports: [team.sport],
     level: team.level,
     managedTeamIds: [team.id],
+    registeredAt: team.registeredAt,
   };
 }
 
@@ -49,6 +52,8 @@ function toUnregisteredHostUser(teamName: string): User {
     sports: seed === undefined ? [] : [seed.sport],
     level: seed?.level ?? 'enjoy',
     managedTeamIds: [],
+    // チームページを持たない主催者の登録日はモックに無い。新規枠に入らないよう1年前とする
+    registeredAt: getDateFromToday(-365),
   };
 }
 

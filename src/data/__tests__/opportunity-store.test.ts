@@ -19,6 +19,13 @@ describe('募集の組み立て', () => {
     }
   });
 
+  it('受理済みの件数は応募から数えられている', () => {
+    // a5 は r5 に受理済み、a6 は r11 に受理済み（application-seed）
+    expect(opportunities.find((o) => o.id === 'r5')?.acceptedCount).toBe(1);
+    expect(opportunities.find((o) => o.id === 'r11')?.acceptedCount).toBe(1);
+    expect(opportunities.find((o) => o.id === 'r2')?.acceptedCount).toBe(0);
+  });
+
   it('IDが重複しない', () => {
     const ids = opportunities.map((o) => o.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -116,7 +123,7 @@ describe('応募の組み立て', () => {
     }
   });
 
-  it('種がすべて募集に解決できている', () => {
+  it('種がすべて読み込まれている', () => {
     expect(applications).toHaveLength(APPLICATION_SEEDS.length);
   });
 

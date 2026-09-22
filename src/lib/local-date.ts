@@ -74,3 +74,14 @@ export function formatSlashDateWithWeekday(date: string): string {
   const [, month, day] = splitDate(date);
   return `${month}/${day}(${getWeekday(date)})`;
 }
+
+/**
+ * 2つの `YYYY-MM-DD` の間の日数（to - from）。
+ * 夏時間の切り替えで1日が23/25時間になっても狂わないよう、UTCの暦日で数える。
+ */
+export function getDaysBetween(from: string, to: string): number {
+  const [fy, fm, fd] = splitDate(from);
+  const [ty, tm, td] = splitDate(to);
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / MS_PER_DAY);
+}

@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 
 import { userSchema, type User } from '@/domain/user';
+import { getDateFromToday } from '@/lib/local-date';
 import { createStore, type ReadableStore } from '@/lib/observable-store';
 
 import { DEMO_EMAIL, DEMO_PASSWORD, DEMO_USER } from './mock/demo-account';
@@ -18,7 +19,23 @@ const storedAccountSchema = z.object({
 
 type StoredAccount = z.infer<typeof storedAccountSchema>;
 
-const storedAccountsSchema = z.array(storedAccountSchema);
+/**
+ * 登録日（registeredAt）を持つ前に保存されたアカウントの移行。
+ *
+ * これが無いと、以前に登録した端末内のアカウントが検証に落ちて消える。
+ * 登録日は記録されていないため、初めて読み込んだ日を登録日とみなす。
+ */
+function withRegisteredAt(raw: unknown): unknown {
+  if (!Array.isArray(raw)) return raw;
+  return raw.map((account: unknown) => {
+    if (typeof account !== 'object' || account === null) return account;
+    const { profile } = account as { profile?: Record<string, unknown> };
+    if (profile === undefined || profile.registeredAt !== undefined) return account;
+    return { ...account, profile: { ...profile, registeredAt: getDateFromToday(0) } };
+  });
+}
+
+const storedAccountsSchema = z.preprocess(withRegisteredAt, z.array(storedAccountSchema));
 const profileEditsSchema = z.record(z.string(), userSchema.partial());
 
 export interface AccountState {
@@ -122,6 +139,7 @@ export async function signup(input: SignupInput): Promise<AuthResult> {
       sports: [],
       level: 'enjoy',
       managedTeamIds: [],
+      registeredAt: getDateFromToday(0),
     },
   };
   signups = [...signups, account];

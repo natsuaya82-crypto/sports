@@ -19,7 +19,8 @@ function makeOpportunity(overrides: Partial<Opportunity> = {}): Opportunity {
     fee: 500,
     level: 'middle',
     capacity: 4,
-    filledCount: 1,
+    reservedCount: 1,
+    acceptedCount: 0,
     hostUserId: 'u-host',
     hostTeamId: 't1',
     hostTeamName: 'テストFC',
@@ -78,7 +79,7 @@ describe('絞りこみ', () => {
 
   it('空きのあるものだけに絞ると、締切と満員が落ちる', () => {
     const closed = makeOpportunity({ id: 'c', status: 'closed' });
-    const full = makeOpportunity({ id: 'd', capacity: 2, filledCount: 2 });
+    const full = makeOpportunity({ id: 'd', capacity: 2, reservedCount: 2, acceptedCount: 0 });
     const result = filterOpportunities([soccer, closed, full], withFilter({ openOnly: true }));
     expect(result).toEqual([soccer]);
   });

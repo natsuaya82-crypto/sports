@@ -1,4 +1,4 @@
-import type { ApplicationStatus } from '@/domain/application';
+import type { Application } from '@/domain/application';
 
 /**
  * 既存の応募のモック種。
@@ -7,26 +7,17 @@ import type { ApplicationStatus } from '@/domain/application';
  * （Application）」「参加予定（ScheduleEntry）」が別々の型に分かれていたが、
  * すべて同じ概念なので Application 1つへ統合した（docs/DOMAIN.md 第8章）。
  *
- * 応募先は募集のタイトルで指定する。IDは起動時に組み立てられるため、
- * ここでは安定しているタイトルで引く。
+ * 応募先は募集のIDで指定する。募集のIDはシードの並び順（r1, r2, ...）と
+ * チームの常設募集（standing-<teamId>）で決まる。
+ *
+ * タイトルで引くと、同じ「メンバー募集(常設)」を持つチームが複数あるため
+ * どのチームへの応募か決まらない。
  */
-export interface ApplicationSeed {
-  id: string;
-  /** 応募先の募集タイトル */
-  opportunityTitle: string;
-  applicantUserId: string;
-  applicantTeamId: string | null;
-  status: ApplicationStatus;
-  message: string;
-  /** `YYYY-MM-DD` */
-  createdAt: string;
-}
-
-export const APPLICATION_SEEDS: readonly ApplicationSeed[] = [
+export const APPLICATION_SEEDS: readonly Application[] = [
   // デモユーザーが運営するチーム(t1: FC世田谷 / t2: 朝ソサイチ駒沢)が受け取った応募
   {
     id: 'a1',
-    opportunityTitle: '【FC世田谷】助っ人DF・GK募集!リーグ戦',
+    opportunityId: 'r1',
     applicantUserId: 'p1',
     applicantTeamId: null,
     status: 'pending',
@@ -35,7 +26,7 @@ export const APPLICATION_SEEDS: readonly ApplicationSeed[] = [
   },
   {
     id: 'a2',
-    opportunityTitle: '【FC世田谷】助っ人DF・GK募集!リーグ戦',
+    opportunityId: 'r1',
     applicantUserId: 'p2',
     applicantTeamId: null,
     status: 'pending',
@@ -44,7 +35,7 @@ export const APPLICATION_SEEDS: readonly ApplicationSeed[] = [
   },
   {
     id: 'a3',
-    opportunityTitle: 'メンバー募集(常設)',
+    opportunityId: 'standing-t1',
     applicantUserId: 'p7',
     applicantTeamId: null,
     status: 'pending',
@@ -53,7 +44,7 @@ export const APPLICATION_SEEDS: readonly ApplicationSeed[] = [
   },
   {
     id: 'a4',
-    opportunityTitle: '【朝活】7人制ソサイチ助っ人FW募集',
+    opportunityId: 'r5',
     applicantUserId: 'p8',
     applicantTeamId: null,
     status: 'pending',
@@ -65,7 +56,7 @@ export const APPLICATION_SEEDS: readonly ApplicationSeed[] = [
   // 参加は accepted な応募である（docs/DOMAIN.md 第4章）。
   {
     id: 'a5',
-    opportunityTitle: '【朝活】7人制ソサイチ助っ人FW募集',
+    opportunityId: 'r5',
     applicantUserId: 'u1',
     applicantTeamId: null,
     status: 'accepted',
@@ -74,7 +65,7 @@ export const APPLICATION_SEEDS: readonly ApplicationSeed[] = [
   },
   {
     id: 'a6',
-    opportunityTitle: '皇居ラン 一緒に走りましょう(キロ6分)',
+    opportunityId: 'r11',
     applicantUserId: 'u1',
     applicantTeamId: null,
     status: 'accepted',
@@ -83,7 +74,7 @@ export const APPLICATION_SEEDS: readonly ApplicationSeed[] = [
   },
   {
     id: 'a7',
-    opportunityTitle: '日曜午後ゆるバスケ!ブランク歓迎',
+    opportunityId: 'r9',
     applicantUserId: 'u1',
     applicantTeamId: null,
     status: 'pending',

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { isFull, type Opportunity } from './opportunity';
+
 /** 応募の状態（docs/DOMAIN.md 第3章） */
 const applicationStatusSchema = z.enum([
   'pending',
@@ -94,4 +96,12 @@ export function getApplicationsForOpportunity(
   return applications
     .filter((a) => a.opportunityId === opportunityId)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * 応募を受理できるか。
+ * まだ検討中で、募集に空きがあること。定員を超えて受理しない。
+ */
+export function canAccept(application: Application, opportunity: Opportunity): boolean {
+  return application.status === 'pending' && !isFull(opportunity);
 }

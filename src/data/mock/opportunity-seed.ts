@@ -23,7 +23,8 @@ export interface OpportunitySeed {
   fee: number;
   level: Level;
   capacity: number;
-  filledCount: number;
+  /** 主催者がアプリ外で既に確保している人数（docs/DOMAIN.md 9.3） */
+  reservedCount: number;
   teamName: string;
   closed?: boolean;
 }
@@ -42,7 +43,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 500,
     level: 'serious',
     capacity: 3,
-    filledCount: 1,
+    reservedCount: 1,
     teamName: 'FC世田谷',
   },
   {
@@ -58,7 +59,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 1500,
     level: 'enjoy',
     capacity: 10,
-    filledCount: 6,
+    reservedCount: 6,
     teamName: 'カマタFC',
   },
   {
@@ -74,7 +75,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 800,
     level: 'middle',
     capacity: 5,
-    filledCount: 5,
+    reservedCount: 5,
     teamName: 'IKEBUKURO HOOPS',
     closed: true,
   },
@@ -91,7 +92,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 0,
     level: 'middle',
     capacity: 1,
-    filledCount: 0,
+    reservedCount: 0,
     teamName: '木場ユナイテッド',
   },
   {
@@ -107,7 +108,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 700,
     level: 'enjoy',
     capacity: 2,
-    filledCount: 0,
+    reservedCount: 0,
     teamName: '朝ソサイチ駒沢',
   },
   {
@@ -123,7 +124,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 300,
     level: 'enjoy',
     capacity: 6,
-    filledCount: 2,
+    reservedCount: 2,
     teamName: 'すぎなみMIX',
   },
   {
@@ -139,7 +140,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 1000,
     level: 'middle',
     capacity: 2,
-    filledCount: 1,
+    reservedCount: 1,
     teamName: '多摩川ベアーズ',
   },
   {
@@ -155,7 +156,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 0,
     level: 'serious',
     capacity: 4,
-    filledCount: 1,
+    reservedCount: 1,
     teamName: 'アデランテ足立',
   },
   {
@@ -171,7 +172,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 500,
     level: 'enjoy',
     capacity: 8,
-    filledCount: 3,
+    reservedCount: 3,
     teamName: 'せたバス',
   },
   {
@@ -187,7 +188,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 800,
     level: 'serious',
     capacity: 1,
-    filledCount: 0,
+    reservedCount: 0,
     teamName: '赤羽レッズ',
   },
   {
@@ -203,7 +204,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 0,
     level: 'enjoy',
     capacity: 10,
-    filledCount: 4,
+    reservedCount: 4,
     teamName: '皇居ランナーズ',
   },
   {
@@ -219,7 +220,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 0,
     level: 'middle',
     capacity: 1,
-    filledCount: 0,
+    reservedCount: 0,
     teamName: 'トヨスFC',
   },
   {
@@ -235,7 +236,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 400,
     level: 'middle',
     capacity: 4,
-    filledCount: 2,
+    reservedCount: 2,
     teamName: '深川クラブ',
   },
   {
@@ -251,7 +252,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 500,
     level: 'enjoy',
     capacity: 3,
-    filledCount: 1,
+    reservedCount: 1,
     teamName: '砧マスターズ',
   },
   {
@@ -267,7 +268,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 0,
     level: 'middle',
     capacity: 1,
-    filledCount: 0,
+    reservedCount: 0,
     teamName: '府中スワローズ',
   },
   {
@@ -283,7 +284,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 600,
     level: 'middle',
     capacity: 2,
-    filledCount: 0,
+    reservedCount: 0,
     teamName: 'ミナトボールクラブ',
   },
   {
@@ -299,7 +300,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 0,
     level: 'enjoy',
     capacity: 15,
-    filledCount: 5,
+    reservedCount: 5,
     teamName: '北区レディースFC',
   },
   {
@@ -315,7 +316,7 @@ export const OPPORTUNITY_SEEDS: readonly OpportunitySeed[] = [
     fee: 0,
     level: 'serious',
     capacity: 6,
-    filledCount: 3,
+    reservedCount: 3,
     teamName: 'TOKYO駅伝部',
   },
 ];

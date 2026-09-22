@@ -11,6 +11,7 @@ function makeUser(overrides: Partial<User> = {}): User {
     sports: ['soccer'],
     level: 'middle',
     managedTeamIds: [],
+    registeredAt: '2025-01-01',
     playStyle: '守備的DF',
     experience: '社会人リーグ',
     ...overrides,

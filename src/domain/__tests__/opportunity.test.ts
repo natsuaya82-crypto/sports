@@ -23,7 +23,8 @@ function makeOpportunity(overrides: Partial<Opportunity> = {}): Opportunity {
     fee: 500,
     level: 'middle',
     capacity: 4,
-    filledCount: 1,
+    reservedCount: 1,
+    acceptedCount: 0,
     hostUserId: 'u-host',
     hostTeamId: 't1',
     hostTeamName: 'テストFC',
@@ -34,12 +35,12 @@ function makeOpportunity(overrides: Partial<Opportunity> = {}): Opportunity {
 }
 
 describe('残り枠', () => {
-  it('capacity から filledCount を引く', () => {
+  it('capacity から埋まっている人数を引く', () => {
     expect(getRemainingCapacity(makeOpportunity())).toBe(3);
   });
 
   it('埋まりすぎても負にならない', () => {
-    const over = makeOpportunity({ capacity: 2, filledCount: 5 });
+    const over = makeOpportunity({ capacity: 2, reservedCount: 5, acceptedCount: 0 });
     expect(getRemainingCapacity(over)).toBe(0);
     expect(isFull(over)).toBe(true);
   });
@@ -51,7 +52,7 @@ describe('応募を受け付けているか', () => {
   });
 
   it('満員なら受け付けない', () => {
-    expect(isOpen(makeOpportunity({ capacity: 2, filledCount: 2 }))).toBe(false);
+    expect(isOpen(makeOpportunity({ capacity: 2, reservedCount: 2, acceptedCount: 0 }))).toBe(false);
   });
 
   it('締切済みなら空きがあっても受け付けない', () => {

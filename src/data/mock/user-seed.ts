@@ -1,4 +1,5 @@
 import type { User } from '@/domain/user';
+import { getDateFromToday } from '@/lib/local-date';
 
 /**
  * ユーザーのモック。
@@ -7,12 +8,16 @@ import type { User } from '@/domain/user';
  * （mockPeople）」が別の型・別の配列だった。同じ概念なので User へ統合した
  * （docs/DOMAIN.md 第8章）。先頭の u1 がデモアカウント。
  *
+ * registeredAt はアプリへの登録日（docs/DOMAIN.md 9.4）。デモが日付とともに
+ * 古びないよう、今日からの相対日数で持つ。一部を30日以内にして新規枠を確かめられるようにしている。
+ *
  * prefecture は prototype が市区町村しか持っていなかったため補ったもの。
  * モックの人物はすべて東京都内。
  */
 export const USER_SEEDS: readonly User[] = [
   {
     id: 'u1',
+    registeredAt: getDateFromToday(-210),
     displayName: 'たなか なつ',
     avatar: 'https://picsum.photos/seed/avatar1/200/200',
     prefecture: '東京都',
@@ -24,6 +29,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p1',
+    registeredAt: getDateFromToday(-400),
     displayName: 'ケンタ',
     avatar: 'https://picsum.photos/seed/person1/200/200',
     prefecture: '東京都',
@@ -41,6 +47,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p2',
+    registeredAt: getDateFromToday(-330),
     displayName: 'ユウマ',
     avatar: 'https://picsum.photos/seed/person2/200/200',
     prefecture: '東京都',
@@ -58,6 +65,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p3',
+    registeredAt: getDateFromToday(-180),
     displayName: 'サラ',
     avatar: 'https://picsum.photos/seed/person3/200/200',
     prefecture: '東京都',
@@ -75,6 +83,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p4',
+    registeredAt: getDateFromToday(-240),
     displayName: 'タクミ',
     avatar: 'https://picsum.photos/seed/person4/200/200',
     prefecture: '東京都',
@@ -92,6 +101,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p5',
+    registeredAt: getDateFromToday(-90),
     displayName: 'ダイキ',
     avatar: 'https://picsum.photos/seed/person5/200/200',
     prefecture: '東京都',
@@ -109,6 +119,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p6',
+    registeredAt: getDateFromToday(-520),
     displayName: 'ハルカ',
     avatar: 'https://picsum.photos/seed/person6/200/200',
     prefecture: '東京都',
@@ -126,6 +137,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p7',
+    registeredAt: getDateFromToday(-60),
     displayName: 'リョウ',
     avatar: 'https://picsum.photos/seed/person7/200/200',
     prefecture: '東京都',
@@ -143,6 +155,7 @@ export const USER_SEEDS: readonly User[] = [
   },
   {
     id: 'p8',
+    registeredAt: getDateFromToday(-5),
     displayName: 'ミオ',
     avatar: 'https://picsum.photos/seed/person8/200/200',
     prefecture: '東京都',

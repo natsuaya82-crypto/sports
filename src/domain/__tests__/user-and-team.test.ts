@@ -13,6 +13,7 @@ function makeUser(overrides: Partial<User> = {}): User {
     sports: ['soccer', 'futsal'],
     level: 'middle',
     managedTeamIds: ['t1'],
+    registeredAt: '2025-01-01',
     ...overrides,
   };
 }
@@ -31,6 +32,7 @@ function makeTeam(overrides: Partial<Team> = {}): Team {
     tagline: '',
     color: '#000000',
     gallery: [],
+    registeredAt: '2025-01-01',
     ...overrides,
   };
 }
