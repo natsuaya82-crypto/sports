@@ -11,6 +11,7 @@ Workerがこの構成を単独で変更してはいけない。
 | クライアント | React Native + Expo (TypeScript) | iOS / Android を単一コードベースで出す。TestFlightとGoogle Playの両方へ配布できる |
 | バックエンド / DB | Supabase (PostgreSQL) | 認証・DB・ストレージが揃い、SQL migrationをリポジトリで管理できる |
 | 言語 | TypeScript (strict) | 型を落とさない。`any`による回避はGateで検出する |
+| 配布（iOS） | GitHub Actions の macOS + App Store Connect API | natsuaya82-crypto/LLLLLLL / JJJJ で実績のある方式に揃える。EAS Build は使わない（Expo のサービスとアカウントを増やさない）。手順は docs/RELEASE.md |
 | ナビゲーション | expo-router | UI prototypeが既にファイルベースルーティングで組まれている。CLAUDE.md 第7章によりprototypeをVisual Source of Truthとするため、これを採用する |
 
 Expo SDK 57 / React 19 / React Native 0.86 / TypeScript 6。
@@ -65,7 +66,7 @@ knipのExpoプラグインが `app.json` の `version` から誤検出するも�
 以下はまだ決めていない。決めるまで実装しない。
 
 - **状態管理**: 追加ライブラリを入れるかどうか。必要になるまで入れない。
-- **配布**: EAS Build の設定と TestFlight / Google Play への接続。
+- **配布（Android）**: Google Play への接続。
 
 ## 追加済みの依存（prototype移植時）
 

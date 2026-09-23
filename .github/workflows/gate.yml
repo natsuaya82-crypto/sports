@@ -5,6 +5,9 @@ on:
     branches: [main]
   push:
     branches: [main]
+  # iOS の配布（ios-deploy.yml）が、ビルドの前に同じ Gate を呼ぶ。
+  # Gate の定義をここ1箇所に保つため、コピーせずに呼び出す（docs/GATE.md）。
+  workflow_call: {}
 
 jobs:
   gate:

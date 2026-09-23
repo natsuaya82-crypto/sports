@@ -1,0 +1,218 @@
+name: iOS Deploy to TestFlight
+
+# 手順の全体と、人がやることは docs/RELEASE.md。
+# LLLLLLL / JJJJ の ios-deploy.yml を元にしている。Secrets の名前も同じなので、
+# 値はそちらと同じものを入れればよい。
+#
+#   Gate → App Store Connect の前提 → ビルド（macOS）→ TestFlight の配布設定
+#
+# 前の段が落ちたら先へ進まない。とくに Gate を通らないものは TestFlight に出さない
+# （CLAUDE.md 第14章 / docs/GATE.md）。
+
+on:
+  workflow_dispatch: {}
+  push:
+    tags:
+      - 'build-*'
+
+# 同時に2本走るとビルド番号やプロファイルの作り直しがぶつかるので、1本ずつ
+concurrency:
+  group: ios-deploy
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    uses: ./.github/workflows/gate.yml
+
+  app-store-connect:
+    name: App Store Connect の前提
+    needs: gate
+    runs-on: ubuntu-latest
+    outputs:
+      app_id: ${{ steps.bootstrap.outputs.app_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Bundle ID を API で登録し、アプリがあるか確かめる。
+      # 無ければここで止まる（macOS で20分ビルドしてから落ちるより安い）
+      - id: bootstrap
+        env:
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.IOS_KEY_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.IOS_API_KEY }}
+        run: node scripts/release/asc-bootstrap.mjs
+
+  build:
+    name: ビルドして TestFlight へ上げる
+    needs: app-store-connect
+    runs-on: macos-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Select Xcode
+        run: |
+          XCODE=$(find /Applications -maxdepth 1 -name "Xcode_26*.app" | sort -V | tail -1)
+          [ -z "$XCODE" ] && XCODE=$(find /Applications -maxdepth 1 -name "Xcode_*.app" | sort -V | tail -1)
+          [ -z "$XCODE" ] && XCODE=/Applications/Xcode.app
+          sudo xcode-select -s "$XCODE"
+          echo "Using: $XCODE"; xcodebuild -version
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      # 足りない Secret を全部名指しで出して止まる。途中で1つずつ気づくより早い
+      - name: Secrets がそろっているか
+        env:
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          IOS_KEY_ID: ${{ secrets.IOS_KEY_ID }}
+          IOS_API_KEY: ${{ secrets.IOS_API_KEY }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          DISTRIBUTION_P12_BASE64: ${{ secrets.DISTRIBUTION_P12_BASE64 }}
+          DISTRIBUTION_P12_PASSWORD: ${{ secrets.DISTRIBUTION_P12_PASSWORD }}
+        run: |
+          missing=""
+          for name in APP_STORE_CONNECT_ISSUER_ID IOS_KEY_ID IOS_API_KEY APPLE_TEAM_ID DISTRIBUTION_P12_BASE64 DISTRIBUTION_P12_PASSWORD; do
+            [ -z "${!name}" ] && missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::次の Secrets がありません:$missing（docs/RELEASE.md の「1回だけやること」）"
+            exit 1
+          fi
+
+      - name: Install Apple Distribution Certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.DISTRIBUTION_P12_BASE64 }}
+          p12-password: ${{ secrets.DISTRIBUTION_P12_PASSWORD }}
+
+      # プロファイルをどの証明書で作るかを決めるため、p12 のシリアルを取り出す。
+      # p12 の書き出し先は一時領域で、使い終わったらすぐ消す
+      - name: 配布証明書のシリアル
+        id: cert
+        env:
+          P12_BASE64: ${{ secrets.DISTRIBUTION_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.DISTRIBUTION_P12_PASSWORD }}
+        run: |
+          P12="$RUNNER_TEMP/dist.p12"
+          echo "$P12_BASE64" | base64 --decode > "$P12"
+          CERT=$(openssl pkcs12 -in "$P12" -nokeys -passin env:P12_PASSWORD 2>/dev/null \
+            || openssl pkcs12 -legacy -in "$P12" -nokeys -passin env:P12_PASSWORD)
+          rm -f "$P12"
+          SERIAL=$(echo "$CERT" | openssl x509 -noout -serial)
+          [ -n "$SERIAL" ] || { echo "::error::p12 から証明書を読めませんでした。DISTRIBUTION_P12_PASSWORD を確認してください"; exit 1; }
+          echo "serial=$SERIAL" >> "$GITHUB_OUTPUT"
+
+      # プロファイルは App Store Connect API で用意する（手作業・期限切れの管理が要らない）
+      - name: Provisioning Profile（API で用意）
+        id: profile
+        env:
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.IOS_KEY_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.IOS_API_KEY }}
+          P12_SERIAL: ${{ steps.cert.outputs.serial }}
+          PROFILE_PATH: ${{ runner.temp }}/sports.mobileprovision
+        run: |
+          node scripts/release/asc-profile.mjs
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      # ビルド番号は Actions の run 番号。run ごとに増えるので重複しない。
+      # 版（1.0.0 など）は app.json の "version" 一箇所から
+      - name: Set build number
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            app.expo.ios.buildNumber = String(${{ github.run_number }});
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+            console.log('version', app.expo.version, 'build', app.expo.ios.buildNumber);
+          "
+
+      # 署名は plugins/with-ios-distribution-signing.js が本体ターゲットにだけ入れる
+      - name: Generate iOS project
+        env:
+          CI: 1
+          EXPO_NO_TELEMETRY: 1
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          IOS_PROFILE_NAME: ${{ steps.profile.outputs.profile_name }}
+        run: npx expo prebuild --platform ios --clean --no-install
+
+      - name: Install CocoaPods
+        run: cd ios && pod install
+
+      # 署名の指定は CLI に渡さない。渡すと依存ライブラリにも波及して Archive が落ちる
+      - name: Build & Archive
+        run: |
+          xcodebuild -workspace ios/sports.xcworkspace \
+            -scheme sports \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/sports.xcarchive" \
+            -destination "generic/platform=iOS" \
+            archive
+
+      - name: Export IPA
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          PROFILE_NAME: ${{ steps.profile.outputs.profile_name }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.tokinets.sports</key>
+              <string>${PROFILE_NAME}</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/sports.xcarchive" \
+            -exportPath "$RUNNER_TEMP/ipa" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+
+      - name: Upload to App Store Connect (TestFlight)
+        uses: apple-actions/upload-testflight-build@v4
+        with:
+          app-path: ${{ runner.temp }}/ipa/sports.ipa
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.IOS_KEY_ID }}
+          api-private-key: ${{ secrets.IOS_API_KEY }}
+          wait-for-processing: false
+
+  testflight:
+    name: TestFlight の内部テスト
+    needs: [app-store-connect, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - env:
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          ASC_KEY_ID: ${{ secrets.IOS_KEY_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.IOS_API_KEY }}
+          APP_ID: ${{ needs.app-store-connect.outputs.app_id }}
+          TESTFLIGHT_TESTER_EMAIL: ${{ vars.TESTFLIGHT_TESTER_EMAIL }}
+        run: node scripts/release/asc-testflight.mjs

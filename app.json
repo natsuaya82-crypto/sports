@@ -8,7 +8,12 @@
     "scheme": "sports",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tokinets.sports",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "predictiveBackGestureEnabled": false,
@@ -37,7 +42,8 @@
           "image": "./assets/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "./plugins/with-ios-distribution-signing"
     ],
     "experiments": {
       "typedRoutes": true
