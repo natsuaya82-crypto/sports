@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "sports",
+    "slug": "sports",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "sports",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tokinets.sports",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false,
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      }
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "root": "./src/ui/app"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF",
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 76
+        }
+      ],
+      "./plugins/with-ios-distribution-signing"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

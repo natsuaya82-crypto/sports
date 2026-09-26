@@ -32,6 +32,8 @@ Workerへ仕事を配るだけではなく、設計・分割・監査・統合�
 
 を明示する。
 
+形式は docs/TASK_TEMPLATE.md を使う。全項目を埋められない場合、Task分割がまだ完了していない。
+
 Worker同士の責務が重ならないようにする。
 
 ## 約15分ごとの監査
@@ -67,7 +69,7 @@ Workerが完了報告しても、Leaderがレビューするまで完了扱い�
 
 ## 完了後
 
-全Taskが統合されたらGateを実行する。
+全Taskが統合されたらGateを実行する（`./scripts/gate.sh --strict`）。
 
 Gate通過後のみBuild/TestFlightへ進む。
 

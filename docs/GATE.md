@@ -6,6 +6,18 @@ Gateは、実装が完了した後にmainを次の段階へ進めてよいか判
 
 Gateを通過しない状態でTestFlightへ進めない。
 
+## 実行
+
+```sh
+./scripts/gate.sh            # 未設定の検証はSKIPとして報告する
+./scripts/gate.sh --strict   # 未設定の検証をFAILとして扱う
+```
+
+GateはPRとmainへのpushごとに GitHub Actions（`.github/workflows/gate.yml`）でも実行される。
+
+各検証を実際に実行するコマンドは `gate.conf` で宣言する。
+検証コマンドの定義箇所は `gate.conf` 一箇所とし、スクリプトやCIへ直接書かない。
+
 ## 必須確認
 
 プロジェクトの技術構成に応じて、利用可能な検証を実行する。
@@ -21,6 +33,11 @@ Gateを通過しない状態でTestFlightへ進めない。
 - unexpected changes
 
 存在しない検証を無理に作る必要はないが、利用可能になった検証はGateへ組み込む。
+
+組み込みは `gate.conf` への追記として行う。
+
+技術構成が確定するまで、構成依存の検証は未設定のままSKIPされる。
+TestFlightへ進む前の最終Gateは `--strict` で実行し、未設定の検証が残っていないことを確認する。
 
 ## Fail時
 

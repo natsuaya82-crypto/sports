@@ -1,0 +1,177 @@
+import { formatSlashDateWithWeekday } from '@/lib/local-date';
+import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+
+import { Screen } from '@/ui/components/Screen';
+import { SportIcon } from '@/ui/components/Icons';
+import { ListEmptyState } from '@/ui/components/ListEmptyState';
+import { ListRow, ListRowBody } from '@/ui/components/list/ListRow';
+import { ScreenHeader } from '@/ui/components/list/ScreenHeader';
+import { Brand, Palette, Spacing, getOpportunityKindColor } from '@/ui/theme';
+import { useCurrentUser } from '@/ui/contexts/auth-context';
+import { useAppTheme, useThemedStyles } from '@/ui/contexts/theme-context';
+import { useApplications } from '@/ui/hooks/use-applications';
+import { useOpportunities } from '@/ui/hooks/use-opportunities';
+import {
+  getApplicationsByApplicant,
+  isActive,
+  type Application,
+} from '@/domain/application';
+import {
+  getEndTime,
+  getOpportunityDate,
+  getOpportunityKindLabel,
+  getStartTime,
+  type Opportunity,
+} from '@/domain/opportunity';
+
+/** 参加予定1件。応募と、その応募先の募集から組み立てる */
+interface ScheduleItem {
+  application: Application;
+  opportunity: Opportunity;
+  /** `YYYY-MM-DD` */
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
+
+/** 参加予定(応募が受理された・参加確定したイベント) */
+export default function ScheduleScreen() {
+  const router = useRouter();
+  const { colors } = useAppTheme();
+  const styles = useThemedStyles(makeStyles);
+
+  const currentUser = useCurrentUser();
+  const applications = useApplications();
+  const opportunities = useOpportunities();
+
+  /**
+   * 参加予定は自分の応募のうち生きているもの(docs/DOMAIN.md 第4章)。
+   * 日程未定の常設募集は日付軸に並べられないので除く。
+   */
+  const data = useMemo(
+    () =>
+      getApplicationsByApplicant(applications, currentUser.id)
+        .filter(isActive)
+        .flatMap<ScheduleItem>((application) => {
+          const opportunity = opportunities.find((o) => o.id === application.opportunityId);
+          if (opportunity === undefined) return [];
+          const date = getOpportunityDate(opportunity);
+          const startTime = getStartTime(opportunity);
+          const endTime = getEndTime(opportunity);
+          if (date === null || startTime === null || endTime === null) return [];
+          return [{ application, opportunity, date, startTime, endTime }];
+        })
+        .sort((a, b) => a.date.localeCompare(b.date)),
+    [applications, opportunities, currentUser.id],
+  );
+
+  const renderItem = ({ item }: { item: ScheduleItem }) => (
+    <ListRow
+      onPress={() =>
+        router.push({
+          pathname: '/opportunity/[id]',
+          params: { id: item.opportunity.id },
+        })
+      }>
+      <View style={styles.dateCol}>
+        <Text style={styles.dateText}>{formatSlashDateWithWeekday(item.date)}</Text>
+        <Text style={styles.timeText}>{item.startTime}</Text>
+      </View>
+      <View style={styles.divider} />
+      <ListRowBody gap={3}>
+        <View style={styles.badgeRow}>
+          <View
+            style={[
+              styles.typeBadge,
+              {
+                backgroundColor: getOpportunityKindColor(
+                  item.opportunity.kind,
+                  colors.tagText,
+                ),
+              },
+            ]}>
+            <SportIcon sport={item.opportunity.sport} size={10} color="#ffffff" />
+            <Text style={styles.typeText}>
+              {getOpportunityKindLabel(item.opportunity.kind)}
+            </Text>
+          </View>
+          <View
+            style={[
+              styles.statusBadge,
+              item.application.status === 'accepted' ? styles.confirmed : styles.pending,
+            ]}>
+            <Text
+              style={[
+                styles.statusText,
+                item.application.status === 'accepted'
+                  ? styles.confirmedText
+                  : styles.pendingText,
+              ]}>
+              {item.application.status === 'accepted' ? '参加確定' : '承認待ち'}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.title} numberOfLines={1}>
+          {item.opportunity.title}
+        </Text>
+        <Text style={styles.meta} numberOfLines={1}>
+          {item.startTime}〜{item.endTime} ・ {item.opportunity.location.name}
+        </Text>
+        <Text style={styles.team} numberOfLines={1}>
+          {item.opportunity.hostTeamName}
+        </Text>
+      </ListRowBody>
+    </ListRow>
+  );
+
+  return (
+    <Screen>
+      <ScreenHeader title="参加予定" />
+
+      <FlatList
+        data={data}
+        keyExtractor={(item) => item.application.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <ListEmptyState
+            title="参加予定はありません"
+            hint="募集に応募して参加が決まると、ここに並びます"
+          />
+        }
+      />
+    </Screen>
+  );
+}
+
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    listContent: { padding: Spacing.three, gap: Spacing.two },
+    dateCol: { width: 58, alignItems: 'center', gap: 2 },
+    dateText: { fontSize: 12, fontWeight: '800', color: c.text },
+    timeText: { fontSize: 11, color: c.textSecondary },
+    divider: { width: StyleSheet.hairlineWidth, alignSelf: 'stretch', backgroundColor: c.border },
+    badgeRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+    typeBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 3,
+      borderRadius: 6,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+    },
+    typeText: { fontSize: 9, fontWeight: '700', color: '#ffffff' },
+    statusBadge: { borderRadius: 999, paddingHorizontal: 7, paddingVertical: 1 },
+    confirmed: { backgroundColor: c.primarySoft },
+    pending: { backgroundColor: c.backgroundElement },
+    statusText: { fontSize: 9, fontWeight: '700' },
+    confirmedText: { color: Brand.primary },
+    pendingText: { color: c.textSecondary },
+    title: { fontSize: 13, fontWeight: '700', color: c.text },
+    meta: { fontSize: 11, color: c.textSecondary },
+    team: { fontSize: 11, fontWeight: '600', color: c.textSecondary },
+  });
