@@ -72,8 +72,10 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      # 足りない Secret を全部名指しで出して止まる。途中で1つずつ気づくより早い
-      - name: Secrets がそろっているか
+      # 足りない Secret を全部名指しで出して止まる。途中で1つずつ気づくより早い。
+      # p12 の2つは任意。そろっていれば手動署名、無ければ Apple のクラウド署名にする
+      - name: Secrets がそろっているか・署名のしかた
+        id: mode
         env:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           IOS_KEY_ID: ${{ secrets.IOS_KEY_ID }}
@@ -83,15 +85,24 @@ jobs:
           DISTRIBUTION_P12_PASSWORD: ${{ secrets.DISTRIBUTION_P12_PASSWORD }}
         run: |
           missing=""
-          for name in APP_STORE_CONNECT_ISSUER_ID IOS_KEY_ID IOS_API_KEY APPLE_TEAM_ID DISTRIBUTION_P12_BASE64 DISTRIBUTION_P12_PASSWORD; do
+          for name in APP_STORE_CONNECT_ISSUER_ID IOS_KEY_ID IOS_API_KEY APPLE_TEAM_ID; do
             [ -z "${!name}" ] && missing="$missing $name"
           done
           if [ -n "$missing" ]; then
             echo "::error::次の Secrets がありません:$missing（docs/RELEASE.md の「1回だけやること」）"
             exit 1
           fi
+          if [ -n "$DISTRIBUTION_P12_BASE64" ] && [ -n "$DISTRIBUTION_P12_PASSWORD" ]; then
+            echo "mode=manual" >> "$GITHUB_OUTPUT"; echo "署名: 配布証明書（p12）で手動署名"
+          elif [ -z "$DISTRIBUTION_P12_BASE64" ] && [ -z "$DISTRIBUTION_P12_PASSWORD" ]; then
+            echo "mode=cloud" >> "$GITHUB_OUTPUT"; echo "署名: App Store Connect API の鍵で Apple のクラウド署名"
+          else
+            echo "::error::DISTRIBUTION_P12_BASE64 と DISTRIBUTION_P12_PASSWORD は、2つそろえるか、2つとも入れないかのどちらかにしてください"
+            exit 1
+          fi
 
       - name: Install Apple Distribution Certificate
+        if: steps.mode.outputs.mode == 'manual'
         uses: apple-actions/import-codesign-certs@v3
         with:
           p12-file-base64: ${{ secrets.DISTRIBUTION_P12_BASE64 }}
@@ -100,6 +111,7 @@ jobs:
       # プロファイルをどの証明書で作るかを決めるため、p12 のシリアルを取り出す。
       # p12 の書き出し先は一時領域で、使い終わったらすぐ消す
       - name: 配布証明書のシリアル
+        if: steps.mode.outputs.mode == 'manual'
         id: cert
         env:
           P12_BASE64: ${{ secrets.DISTRIBUTION_P12_BASE64 }}
@@ -116,6 +128,7 @@ jobs:
 
       # プロファイルは App Store Connect API で用意する（手作業・期限切れの管理が要らない）
       - name: Provisioning Profile（API で用意）
+        if: steps.mode.outputs.mode == 'manual'
         id: profile
         env:
           ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -127,6 +140,19 @@ jobs:
           node scripts/release/asc-profile.mjs
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      # クラウド署名では xcodebuild が API の鍵で Apple に署名を頼む。鍵はファイルで渡す
+      - name: API の鍵を xcodebuild 用に置く
+        if: steps.mode.outputs.mode == 'cloud'
+        env:
+          IOS_API_KEY: ${{ secrets.IOS_API_KEY }}
+        run: |
+          KEY="$RUNNER_TEMP/AuthKey.p8"
+          if echo "$IOS_API_KEY" | grep -q "BEGIN"; then
+            printf '%s\n' "$IOS_API_KEY" > "$KEY"
+          else
+            echo "$IOS_API_KEY" | base64 --decode > "$KEY"
+          fi
 
       # ビルド番号は Actions の run 番号。run ごとに増えるので重複しない。
       # 版（1.0.0 など）は app.json の "version" 一箇所から
@@ -152,21 +178,50 @@ jobs:
       - name: Install CocoaPods
         run: cd ios && pod install
 
-      # 署名の指定は CLI に渡さない。渡すと依存ライブラリにも波及して Archive が落ちる
+      # 署名の指定（チーム・プロファイル）は CLI に渡さない。渡すと依存ライブラリにも
+      # 波及して Archive が落ちる。クラウド署名で渡すのは「API の鍵で Apple に頼んでよい」
+      # という許可（-allowProvisioningUpdates と鍵）だけで、署名の設定ではない
       - name: Build & Archive
+        env:
+          MODE: ${{ steps.mode.outputs.mode }}
+          ASC_KEY_ID: ${{ secrets.IOS_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
+          AUTH=()
+          if [ "$MODE" = cloud ]; then
+            AUTH=(-allowProvisioningUpdates
+              -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8"
+              -authenticationKeyID "$ASC_KEY_ID"
+              -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          fi
           xcodebuild -workspace ios/sports.xcworkspace \
             -scheme sports \
             -configuration Release \
             -archivePath "$RUNNER_TEMP/sports.xcarchive" \
             -destination "generic/platform=iOS" \
+            "${AUTH[@]}" \
             archive
 
       - name: Export IPA
         env:
+          MODE: ${{ steps.mode.outputs.mode }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           PROFILE_NAME: ${{ steps.profile.outputs.profile_name }}
+          ASC_KEY_ID: ${{ secrets.IOS_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
         run: |
+          if [ "$MODE" = manual ]; then
+            SIGNING="<key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict><key>com.tokinets.sports</key><string>${PROFILE_NAME}</string></dict>"
+            AUTH=()
+          else
+            SIGNING="<key>signingStyle</key><string>automatic</string>"
+            AUTH=(-allowProvisioningUpdates
+              -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8"
+              -authenticationKeyID "$ASC_KEY_ID"
+              -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          fi
           cat > "$RUNNER_TEMP/ExportOptions.plist" << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -176,20 +231,16 @@ jobs:
             <string>app-store-connect</string>
             <key>teamID</key>
             <string>${APPLE_TEAM_ID}</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>com.tokinets.sports</key>
-              <string>${PROFILE_NAME}</string>
-            </dict>
+            ${SIGNING}
           </dict>
           </plist>
           EOF
+          plutil -lint "$RUNNER_TEMP/ExportOptions.plist"
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/sports.xcarchive" \
             -exportPath "$RUNNER_TEMP/ipa" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            "${AUTH[@]}"
 
       - name: Upload to App Store Connect (TestFlight)
         uses: apple-actions/upload-testflight-build@v4

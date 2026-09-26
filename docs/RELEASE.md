@@ -16,7 +16,7 @@ Gate → App Store Connect の前提 → ビルド（macOS）→ TestFlight の�
 | --- | --- |
 | Gate | typecheck / lint / test / build / 重複 / 未使用 / レイヤ境界 など（gate.yml をそのまま呼ぶ） |
 | App Store Connect の前提 | Bundle ID `com.tokinets.sports` を API で登録。アプリがあるか確かめ、無ければ止まる |
-| ビルド | 配布証明書を入れる → **プロファイルを API で用意** → ビルド番号を run 番号にする → `expo prebuild` → Archive → Export → アップロード |
+| ビルド | 署名のしかたを決める（下の表）→ ビルド番号を run 番号にする → `expo prebuild` → Archive → Export → アップロード |
 | TestFlight | 内部テストグループを API で作り（すべてのビルドを自動で配る設定）、テスターを入れる |
 
 LLLLLLL / JJJJ との違いは、**プロビジョニングプロファイルを手で作らない**こと。
@@ -30,18 +30,34 @@ LLLLLLL / JJJJ との違いは、**プロビジョニングプロファイルを
 
 GitHub → natsuaya82-crypto/sports → Settings → Secrets and variables → Actions → **Secrets**
 
-LLLLLLL / JJJJ に入れてあるものと**同じ値**を入れる。
+**必須は4つ。** うち3つは App Store Connect の同じ画面で手に入る。
+
+| 名前 | 中身 | どこで手に入るか |
+| --- | --- | --- |
+| `APP_STORE_CONNECT_ISSUER_ID` | Issuer ID | App Store Connect → ユーザとアクセス → 統合 → App Store Connect API → チームキー。表の上に出ている |
+| `IOS_KEY_ID` | キー ID | 同じ画面のキーの一覧 |
+| `IOS_API_KEY` | キー（.p8）の中身 | 同じ画面でキーを作るときに一度だけダウンロードできる。テキストで開き、`-----BEGIN` から `END-----` までを丸ごと貼る |
+| `APPLE_TEAM_ID` | Team ID（英数字10桁） | developer.apple.com → Account → メンバーシップの詳細 |
+
+LLLLLLL / JJJJ に入れてあるキーと同じものでよい。ただし Secrets は GitHub でも読み出せないので、
+**.p8 ファイルが手元に残っていなければ、新しくキーを作る**（古いキーはそのまま使い続けられる）。
+
+- チームキーの「＋」→ 名前は何でもよい → **アクセスは Admin** → 生成 → ダウンロード
+- Admin が要るのは、下の「クラウド署名」で Apple に配布証明書を用意してもらうため
+
+**任意の2つ**（配布証明書 .p12 を使う場合だけ）
 
 | 名前 | 中身 |
 | --- | --- |
-| `APP_STORE_CONNECT_ISSUER_ID` | App Store Connect API の Issuer ID |
-| `IOS_KEY_ID` | API キーの Key ID |
-| `IOS_API_KEY` | API キー（.p8）の中身 |
-| `APPLE_TEAM_ID` | Apple Developer の Team ID |
 | `DISTRIBUTION_P12_BASE64` | 配布証明書（.p12）の base64 |
 | `DISTRIBUTION_P12_PASSWORD` | その .p12 のパスワード |
 
-`PROVISIONING_PROFILE_BASE64` は**要らない**（API で作るため）。
+| 入れたもの | 署名のしかた |
+| --- | --- |
+| 4つだけ | **クラウド署名**。xcodebuild が API のキーで Apple に署名を頼む。証明書もプロファイルも Apple 側で管理される |
+| 4つ + p12 の2つ | 手動署名（LLLLLLL / JJJJ と同じ）。プロファイルは API で自動で用意する |
+
+`PROVISIONING_PROFILE_BASE64` はどちらの方式でも**要らない**。
 
 同じ画面の **Variables** に、TestFlight で受け取る人のメールを入れる（任意）。
 
@@ -50,6 +66,7 @@ LLLLLLL / JJJJ に入れてあるものと**同じ値**を入れる。
 | `TESTFLIGHT_TESTER_EMAIL` | App Store Connect にユーザーとして登録されているメール |
 
 公開リポジトリなので、メールはコードやファイルに書かない。
+**キーの中身をチャットやファイルに貼らないこと。** GitHub の Secrets の画面にだけ入れる。
 
 ### 2. 一度実行する（Bundle ID が登録される）
 
@@ -110,5 +127,6 @@ App Store で公開したあとは、公開済みの版にはビルドを受け�
 | 「次の Secrets がありません」 | 名前が表のとおりか（大文字小文字も） |
 | 「アプリがありません」 | 手順 3 をまだやっていない |
 | 「配布証明書が App Store Connect に見つかりません」 | `DISTRIBUTION_P12_BASE64` が同じチームの、失効していない証明書か |
-| プロファイルの段で 403 | API キーの権限が足りない。App Store Connect → ユーザとアクセス → 統合 → キー で、**Admin** の権限を持つキーを使う |
+| プロファイルの段 / Archive で 403 や「No signing certificate」 | API キーの権限が足りない。**Admin** のキーを作り直して `IOS_KEY_ID` と `IOS_API_KEY` を入れ替える |
+| 「2つそろえるか、2つとも入れないか」 | p12 の Secrets が片方だけ入っている |
 | 緑なのに TestFlight に出ない | Apple からのメール（却下の理由が届く） |
