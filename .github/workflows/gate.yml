@@ -32,8 +32,11 @@ jobs:
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
 
     steps:
+      # ios-deploy.yml 経由で別のリポジトリから呼ばれても sports を検査する。
+      # sports 自身で走るときはイベントの ref（PR の head など）になる
       - uses: actions/checkout@v4
         with:
+          repository: natsuaya82-crypto/sports
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
