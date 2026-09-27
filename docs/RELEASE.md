@@ -101,6 +101,19 @@ App Store Connect → マイ App → ＋ → 新規 App
 - **Actions の画面から**: Actions → iOS Deploy to TestFlight → Run workflow
   （この方法は ios-deploy.yml が main に入ってから使える）
 
+## 鍵を借りたビルド（一時的）
+
+sports に Secrets が入るまでのあいだ、natsuaya82-crypto/LLLLLLL の Secrets を借りてビルドしている
+（2026-09 に owner が許可）。
+
+- LLLLLLL の `build-sports` ブランチに、このリポジトリの ios-deploy.yml を呼ぶだけの設定を置いている。
+  LLLLLLL の main には触れていない
+- ビルドの手順は sports の ios-deploy.yml 1箇所のまま。LLLLLLL 側に手順を複製していない
+- 別リポジトリから呼ばれたときのビルド番号は 1000 番台（sports の run 番号とぶつけないため）
+
+**sports に Secrets を入れたら、LLLLLLL の `build-sports` ブランチを消す。**
+借りた状態を続けると、LLLLLLL の鍵を失効・更新したときに sports のビルドも止まる。
+
 ## 届いたビルドを入れる
 
 1. アップロード完了から **10〜30分**で App Store Connect の処理が終わる

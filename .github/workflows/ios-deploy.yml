@@ -14,6 +14,10 @@ on:
   push:
     tags:
       - 'build-*'
+  # 別のリポジトリから、そのリポジトリの Secrets を渡して呼ぶための入口。
+  # sports に Secrets が入るまでのあいだ、LLLLLLL から鍵を借りてビルドしている
+  # （docs/RELEASE.md「鍵を借りたビルド」）。
+  workflow_call: {}
 
 # 同時に2本走るとビルド番号やプロファイルの作り直しがぶつかるので、1本ずつ
 concurrency:
@@ -32,6 +36,8 @@ jobs:
       app_id: ${{ steps.bootstrap.outputs.app_id }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: natsuaya82-crypto/sports
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -63,6 +69,8 @@ jobs:
           echo "Using: $XCODE"; xcodebuild -version
 
       - uses: actions/checkout@v4
+        with:
+          repository: natsuaya82-crypto/sports
 
       - uses: actions/setup-node@v4
         with:
@@ -156,12 +164,19 @@ jobs:
 
       # ビルド番号は Actions の run 番号。run ごとに増えるので重複しない。
       # 版（1.0.0 など）は app.json の "version" 一箇所から
+      # 別のリポジトリから呼ばれたときは run 番号がそちらの連番になり、sports の番号と
+      # ぶつかる。1000 を足して番号の帯を分ける
       - name: Set build number
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          CALLER: ${{ github.repository }}
         run: |
           node -e "
             const fs = require('fs');
             const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
-            app.expo.ios.buildNumber = String(${{ github.run_number }});
+            const run = Number(process.env.RUN_NUMBER);
+            const offset = process.env.CALLER === 'natsuaya82-crypto/sports' ? 0 : 1000;
+            app.expo.ios.buildNumber = String(run + offset);
             fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
             console.log('version', app.expo.version, 'build', app.expo.ios.buildNumber);
           "
@@ -257,6 +272,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          repository: natsuaya82-crypto/sports
       - uses: actions/setup-node@v4
         with:
           node-version: 22
